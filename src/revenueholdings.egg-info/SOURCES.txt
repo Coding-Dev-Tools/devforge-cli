@@ -1,9 +1,0 @@
-pyproject.toml
-src/revenueholdings/__init__.py
-src/revenueholdings/cli.py
-src/revenueholdings.egg-info/PKG-INFO
-src/revenueholdings.egg-info/SOURCES.txt
-src/revenueholdings.egg-info/dependency_links.txt
-src/revenueholdings.egg-info/entry_points.txt
-src/revenueholdings.egg-info/requires.txt
-src/revenueholdings.egg-info/top_level.txt
