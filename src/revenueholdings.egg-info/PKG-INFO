@@ -1,0 +1,36 @@
+Metadata-Version: 2.4
+Name: revenueholdings
+Version: 0.1.0
+Summary: Unified CLI for Revenue Holdings developer tools — api-contract-guardian, json2sql, deploydiff, configdrift
+Author: Revenue Holdings
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/Coding-Dev-Tools/revenueholdings
+Project-URL: Repository, https://github.com/Coding-Dev-Tools/revenueholdings
+Project-URL: Issue Tracker, https://github.com/Coding-Dev-Tools/revenueholdings/issues
+Keywords: revenueholdings,cli,devops,developer-tools
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: typer>=0.9.0
+Requires-Dist: rich>=13.0.0
+Provides-Extra: guard
+Requires-Dist: api-contract-guardian>=0.1.0; extra == "guard"
+Provides-Extra: sql
+Requires-Dist: json2sql>=0.1.0; extra == "sql"
+Provides-Extra: deploy
+Requires-Dist: deploydiff>=0.1.0; extra == "deploy"
+Provides-Extra: drift
+Requires-Dist: configdrift>=0.1.0; extra == "drift"
+Provides-Extra: all
+Requires-Dist: api-contract-guardian>=0.1.0; extra == "all"
+Requires-Dist: json2sql>=0.1.0; extra == "all"
+Requires-Dist: deploydiff>=0.1.0; extra == "all"
+Requires-Dist: configdrift>=0.1.0; extra == "all"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"

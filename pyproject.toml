@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "revenueholdings"
+version = "0.1.0"
+description = "Unified CLI for Revenue Holdings developer tools — api-contract-guardian, json2sql, deploydiff, configdrift"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Revenue Holdings"}]
+keywords = ["revenueholdings", "cli", "devops", "developer-tools"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+]
+
+# Optional groups — install with: pip install revenueholdings[all]
+[project.optional-dependencies]
+guard = ["api-contract-guardian>=0.1.0"]
+sql = ["json2sql>=0.1.0"]
+deploy = ["deploydiff>=0.1.0"]
+drift = ["configdrift>=0.1.0"]
+all = [
+    "api-contract-guardian>=0.1.0",
+    "json2sql>=0.1.0",
+    "deploydiff>=0.1.0",
+    "configdrift>=0.1.0",
+]
+dev = ["pytest>=7.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/Coding-Dev-Tools/revenueholdings"
+Repository = "https://github.com/Coding-Dev-Tools/revenueholdings"
+"Issue Tracker" = "https://github.com/Coding-Dev-Tools/revenueholdings/issues"
+
+[project.scripts]
+rh = "revenueholdings.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
