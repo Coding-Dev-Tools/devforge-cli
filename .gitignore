@@ -2,8 +2,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
-*.egg
 dist/
 build/
-.venv/
+.eggs/
+*.egg
 .env
+venv/
+.venv/
