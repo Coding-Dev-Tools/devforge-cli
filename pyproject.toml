@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "revenueholdings"
 version = "0.1.0"
-description = "Unified CLI for Revenue Holdings developer tools — api-contract-guardian, json2sql, deploydiff, configdrift"
+description = "Unified CLI for 4 developer tools: API contract checking, JSON-to-SQL conversion, infrastructure diff previews, and config drift detection"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Revenue Holdings"}]
-keywords = ["revenueholdings", "cli", "devops", "developer-tools"]
+keywords = ["revenueholdings", "cli", "devops", "developer-tools", "api-contract", "openapi", "json-to-sql", "infrastructure", "terraform", "cloudformation", "config-drift", "devsecops"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
