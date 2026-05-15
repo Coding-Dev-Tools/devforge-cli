@@ -10,7 +10,7 @@ Four production-ready CLI tools for API contracts, SQL generation, infrastructur
 
 ---
 
-[🏠 Landing Page](https://coding-dev-tools.github.io/revenueholdings.dev/) · [💰 Pricing](https://coding-dev-tools.github.io/revenueholdings.dev/pricing.html) · [🐛 Report a Bug](https://github.com/Coding-Dev-Tools/revenueholdings/issues)
+[🏠 Landing Page](https://coding-dev-tools.github.io/revenueholdings.dev/) · [💰 Pricing](https://coding-dev-tools.github.io/revenueholdings.dev/pricing.html) · [📝 Blog](https://coding-dev-tools.github.io/revenueholdings.dev/blog.html) · [🐛 Report a Bug](https://github.com/Coding-Dev-Tools/revenueholdings/issues)
 
 ---
 
