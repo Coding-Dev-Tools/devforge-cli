@@ -1,5 +1,7 @@
 # Revenue Holdings CLI
 
+[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/revenueholdings?style=social)](https://github.com/Coding-Dev-Tools/revenueholdings/stargazers)
+
 **The `rh` command — one install, four developer CLI tools.**
 
 [![PyPI](https://img.shields.io/pypi/v/revenueholdings)](https://pypi.org/project/revenueholdings/)
