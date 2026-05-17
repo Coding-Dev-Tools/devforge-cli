@@ -3,15 +3,11 @@
 import builtins as _builtins
 import subprocess
 import sys
-from pathlib import Path
-from typing import Optional, List
-
 import typer
+from revenueholdings import TOOLS, __version__
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
-
-from revenueholdings import __version__, TOOLS
+from rich.table import Table
 
 app = typer.Typer(
     name="rh",
@@ -43,7 +39,7 @@ def main_callback(
 
 @app.command(name="tools")
 def list_tools(
-    name: Optional[str] = typer.Argument(None, help="Show details for a specific tool."),
+    name: str | None = typer.Argument(None, help="Show details for a specific tool."),
 ):
     """List available Revenue Holdings CLI tools."""
     if name:
@@ -80,8 +76,8 @@ def list_tools(
             )
 
         console.print(table)
-        console.print(f"\n[dim]Install individually:[/dim] [green]pip install revenueholdings[guard][/green]")
-        console.print(f"[dim]Install all:[/dim] [green]pip install revenueholdings[all][/green]")
+        console.print("\n[dim]Install individually:[/dim] [green]pip install revenueholdings[guard][/green]")
+        console.print("[dim]Install all:[/dim] [green]pip install revenueholdings[all][/green]")
 
 
 @app.command()
@@ -116,19 +112,16 @@ def install(
             raise typer.Exit(code=1)
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 @app.command(name="versions")
 def show_versions(
-    tool: Optional[str] = typer.Argument(None, help="Check version of a specific tool."),
+    tool: str | None = typer.Argument(None, help="Check version of a specific tool."),
 ):
     """Show installed tool versions."""
-    if tool:
-        targets = [tool] if tool in TOOLS else []
-    else:
-        targets = _builtins.list(TOOLS.keys())
-    
+    targets = ([tool] if tool in TOOLS else []) if tool else _builtins.list(TOOLS.keys())
+
     for t in targets:
         info = TOOLS[t]
         try:
@@ -155,7 +148,7 @@ def _make_dispatch(tool_name: str):
 
     def dispatch(
         ctx: typer.Context,
-        args: List[str] = typer.Argument(None, help="Arguments to pass to the tool."),
+        args: list[str] = typer.Argument(None, help="Arguments to pass to the tool."),  # noqa: B008
     ):
         info = TOOLS.get(tool_name)
         if not info:
@@ -173,7 +166,7 @@ def _make_dispatch(tool_name: str):
                 f"[red]Tool '{tool_name}' not installed.[/red]\n"
                 f"Install with: [green]pip install revenueholdings[{tool_name}][/green]"
             )
-            raise typer.Exit(code=1)
+            raise typer.Exit(code=1) from None
 
     dispatch.__name__ = tool_name
     dispatch.__doc__ = f"Run `{pkg}` commands via the {tool_name} subcommand."

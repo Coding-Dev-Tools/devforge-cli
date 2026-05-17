@@ -1,10 +1,9 @@
 """Tests for revenueholdings meta-package."""
 from __future__ import annotations
 
-from typer.testing import CliRunner
-
-from revenueholdings.cli import app
 from revenueholdings import TOOLS, __version__
+from revenueholdings.cli import app
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
