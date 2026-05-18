@@ -120,7 +120,11 @@ def show_versions(
     tool: str | None = typer.Argument(None, help="Check version of a specific tool."),
 ):
     """Show installed tool versions."""
-    targets = ([tool] if tool in TOOLS else []) if tool else _builtins.list(TOOLS.keys())
+    if tool is not None and tool not in TOOLS:
+        console.print(f"[red]Unknown tool: {tool}[/red]")
+        console.print(f"Available: {', '.join(TOOLS.keys())}")
+        raise typer.Exit(code=1)
+    targets = [tool] if tool else _builtins.list(TOOLS.keys())
 
     for t in targets:
         info = TOOLS[t]
