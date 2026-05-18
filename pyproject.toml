@@ -52,9 +52,9 @@ all = [
 dev = ["pytest>=7.0.0"]
 
 [project.urls]
-Homepage = "https://github.com/Coding-Dev-Tools/revenueholdings"
-Repository = "https://github.com/Coding-Dev-Tools/revenueholdings"
-"Issue Tracker" = "https://github.com/Coding-Dev-Tools/revenueholdings/issues"
+Homepage = "https://github.com/Coding-Dev-Tools/devforge"
+Repository = "https://github.com/Coding-Dev-Tools/devforge"
+"Issue Tracker" = "https://github.com/Coding-Dev-Tools/devforge/issues"
 
 [project.scripts]
 rh = "revenueholdings.cli:app"
