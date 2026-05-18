@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "revenueholdings"
 version = "0.2.0"
-description = "Unified CLI for 10 developer tools: API contracts, SQL generation, infra diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal"
+description = "Unified CLI for 11 developer tools: API contracts, SQL generation, infra diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, data transformation, and dead code removal"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -19,13 +19,14 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "typer>=0.9.0",
     "rich>=13.0.0",
 ]
 
-# Optional groups â€” install with: pip install revenueholdings[all]
+# Optional dependency groups — install with: pip install revenueholdings[all]
 [project.optional-dependencies]
 guard = ["api-contract-guardian>=0.1.0"]
 sql = ["json2sql>=0.1.0"]
@@ -37,6 +38,7 @@ envault = ["envault>=0.1.0"]
 schema = ["schemaforge>=1.7.0"]
 mcp = ["click-to-mcp>=0.4.0"]
 deadcode = ["deadcode>=0.1.1"]
+morph = ["datamorph>=0.1.0"]
 all = [
     "api-contract-guardian>=0.1.0",
     "json2sql>=0.1.0",
@@ -48,6 +50,7 @@ all = [
     "schemaforge>=1.7.0",
     "click-to-mcp>=0.4.0",
     "deadcode>=0.1.1",
+    "datamorph>=0.1.0",
 ]
 dev = ["pytest>=7.0.0"]
 

@@ -2,13 +2,13 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/devforge?style=social)](https://github.com/Coding-Dev-Tools/devforge/stargazers)
 
-**The `rh` command — one install, ten developer CLI tools.**
+**The `rh` command — one install, eleven developer CLI tools.**
 
 [![PyPI](https://img.shields.io/pypi/v/revenueholdings)](https://pypi.org/project/revenueholdings/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/revenueholdings)](https://pypi.org/project/revenueholdings/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Ten production-ready CLI tools for API contracts, SQL generation, infrastructure diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal — in a single package. Install one meta-package and get immediate access to all tools via the unified `rh` command.
+Eleven production-ready CLI tools for API contracts, SQL generation, infrastructure diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, data transformation, and dead code removal — in a single package. Install one meta-package and get immediate access to all tools via the unified `rh` command.
 
 ---
 
@@ -18,7 +18,7 @@ Ten production-ready CLI tools for API contracts, SQL generation, infrastructure
 
 ## Why the Suite?
 
-Instead of installing ten separate tools and learning ten different CLIs, `pip install revenueholdings[all]` gives you:
+Instead of installing eleven separate tools and learning eleven different CLIs, `pip install revenueholdings[all]` gives you:
 
 - **Single CLI** (`rh`) to invoke any tool — no context switching
 - **Consistent flags, output formats, and help** across all tools
@@ -41,6 +41,7 @@ pip install revenueholdings[envault]  # Envault
 pip install revenueholdings[schema]   # SchemaForge
 pip install revenueholdings[mcp]      # click-to-mcp
 pip install revenueholdings[deadcode] # DeadCode
+pip install revenueholdings[morph]    # DataMorph
 ```
 
 ## Usage
@@ -84,6 +85,9 @@ rh mcp wrap my-cli --transport http
 
 # DeadCode — find unused exports in React/Next.js
 rh deadcode scan src/
+
+# DataMorph — transform JSON, CSV, YAML, and XML
+rh morph convert data.csv --to json
 ```
 
 ## Tools
@@ -100,6 +104,7 @@ rh deadcode scan src/
 | `schema` | schemaforge | Bidirectional ORM schema converter — 11 formats with zero-loss roundtripping |
 | `mcp` | click-to-mcp | Auto-wrap any Click/typer CLI as an MCP server — zero code changes |
 | `deadcode` | deadcode | Detect unused exports, dead routes, orphaned CSS in TypeScript/React/Next.js projects |
+| `morph` | datamorph | Transform, validate, and convert structured data between JSON, CSV, YAML, and XML |
 
 ## Links
 
