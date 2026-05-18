@@ -3,14 +3,14 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "revenueholdings"
-version = "0.2.0"
+name = "devforge"
+version = "0.3.0"
 description = "Unified CLI for 10 developer tools: API contracts, SQL generation, infra diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{name = "Revenue Holdings"}]
-keywords = ["revenueholdings", "cli", "devops", "developer-tools", "api-contract", "openapi", "json-to-sql", "infrastructure", "terraform", "cloudformation", "config-drift", "devsecops", "mocking", "api-keys", "env", "schema", "mcp", "dead-code"]
+authors = [{name = "DevForge"}]
+keywords = ["devforge", "cli", "devops", "developer-tools", "api-contract", "openapi", "json-to-sql", "infrastructure", "terraform", "cloudformation", "config-drift", "devsecops", "mocking", "api-keys", "env", "schema", "mcp", "dead-code"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -25,7 +25,7 @@ dependencies = [
     "rich>=13.0.0",
 ]
 
-# Optional groups â€” install with: pip install revenueholdings[all]
+# Optional groups â€” install with: pip install devforge[all]
 [project.optional-dependencies]
 guard = ["api-contract-guardian>=0.1.0"]
 sql = ["json2sql>=0.1.0"]
@@ -57,7 +57,7 @@ Repository = "https://github.com/Coding-Dev-Tools/devforge"
 "Issue Tracker" = "https://github.com/Coding-Dev-Tools/devforge/issues"
 
 [project.scripts]
-rh = "revenueholdings.cli:app"
+devforge = "devforge.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]

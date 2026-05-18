@@ -1,8 +1,8 @@
-"""Tests for revenueholdings meta-package."""
+"""Tests for devforge meta-package."""
 from __future__ import annotations
 
-from revenueholdings import TOOLS, __version__
-from revenueholdings.cli import app
+from devforge import TOOLS, __version__
+from devforge.cli import app
 from typer.testing import CliRunner
 from unittest import mock
 
@@ -13,7 +13,7 @@ class TestVersion:
     def test_version_flag(self):
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
-        assert "revenueholdings" in result.stdout.lower() or "rh" in result.stdout.lower()
+        assert "devforge" in result.stdout.lower()
         assert __version__ in result.stdout
 
 
@@ -37,7 +37,7 @@ class TestToolsCommand:
 
 
 class TestInstallCommand:
-    @mock.patch("revenueholdings.cli.subprocess.run")
+    @mock.patch("devforge.cli.subprocess.run")
     def test_install_specific_tool(self, mock_run):
         """Install a specific tool by name."""
         mock_run.return_value = mock.MagicMock(returncode=0, stdout="", stderr="")
@@ -46,7 +46,7 @@ class TestInstallCommand:
         assert "Successfully" in result.stdout
         mock_run.assert_called_once()
 
-    @mock.patch("revenueholdings.cli.subprocess.run")
+    @mock.patch("devforge.cli.subprocess.run")
     def test_install_all(self, mock_run):
         """Install all tools via the 'all' alias."""
         mock_run.return_value = mock.MagicMock(returncode=0, stdout="", stderr="")
@@ -62,7 +62,7 @@ class TestInstallCommand:
         assert "Unknown" in result.stdout
         assert "Available:" in result.stdout
 
-    @mock.patch("revenueholdings.cli.subprocess.run")
+    @mock.patch("devforge.cli.subprocess.run")
     def test_install_failure(self, mock_run):
         """Handle pip install failure gracefully."""
         mock_run.return_value = mock.MagicMock(returncode=1, stdout="", stderr="Error message")
@@ -83,7 +83,7 @@ class TestVersionsCommand:
         assert result.exit_code == 1
         assert "Unknown" in result.stdout
 
-    @mock.patch("revenueholdings.cli.subprocess.run")
+    @mock.patch("devforge.cli.subprocess.run")
     def test_versions_specific_tool_not_installed(self, mock_run):
         """Show 'not installed' for a tool that isn't installed."""
         mock_run.return_value = mock.MagicMock(

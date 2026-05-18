@@ -1,6 +1,6 @@
-"""Revenue Holdings — unified CLI for all developer tools."""
+"""DevForge — unified CLI for all developer tools."""
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 # Tool registry: name -> (package, description, icon, pricing)
 TOOLS = {

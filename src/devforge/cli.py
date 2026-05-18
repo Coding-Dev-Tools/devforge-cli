@@ -1,17 +1,17 @@
-"""Revenue Holdings unified CLI entry point."""
+"""DevForge unified CLI entry point."""
 
 import builtins as _builtins
 import subprocess
 import sys
 import typer
-from revenueholdings import TOOLS, __version__
+from devforge import TOOLS, __version__
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 app = typer.Typer(
-    name="rh",
-    help="Revenue Holdings — unified CLI for developer tools.",
+    name="devforge",
+    help="DevForge — unified CLI for developer tools.",
     rich_markup_mode="rich",
 )
 console = Console()
@@ -19,7 +19,7 @@ console = Console()
 
 def _show_version(value: bool) -> None:
     if value:
-        console.print(f"[bold]rh[/] v{__version__} — Revenue Holdings CLI")
+        console.print(f"[bold]devforge[/] v{__version__} — DevForge CLI")
         raise typer.Exit()
 
 
@@ -41,7 +41,7 @@ def main_callback(
 def list_tools(
     name: str | None = typer.Argument(None, help="Show details for a specific tool."),
 ):
-    """List available Revenue Holdings CLI tools."""
+    """List available DevForge CLI tools."""
     if name:
         tool = TOOLS.get(name)
         if not tool:
@@ -55,11 +55,11 @@ def list_tools(
                 f"Pricing: [yellow]{tool['pricing']}[/yellow]\n"
                 f"Status: [green]{tool['status']}[/green]\n"
                 f"URL: {tool['url']}",
-                title=f"rh {name}",
+                title=f"devforge {name}",
             )
         )
     else:
-        table = Table(title="Revenue Holdings CLI Tools")
+        table = Table(title="DevForge CLI Tools")
         table.add_column("Command", style="cyan")
         table.add_column("Package", style="green")
         table.add_column("Description")
@@ -76,8 +76,8 @@ def list_tools(
             )
 
         console.print(table)
-        console.print("\n[dim]Install individually:[/dim] [green]pip install revenueholdings[guard][/green]")
-        console.print("[dim]Install all:[/dim] [green]pip install revenueholdings[all][/green]")
+        console.print("\n[dim]Install individually:[/dim] [green]pip install devforge[guard][/green]")
+        console.print("[dim]Install all:[/dim] [green]pip install devforge[all][/green]")
 
 
 @app.command()
@@ -86,7 +86,7 @@ def install(
         ..., help="Tool to install: " + ", ".join(TOOLS.keys()) + ", or 'all'"
     ),
 ):
-    """Install a Revenue Holdings tool."""
+    """Install a DevForge tool."""
     if tool == "all":
         targets = _builtins.list(TOOLS.keys())
         extras = ",".join(TOOLS.keys())
@@ -98,7 +98,7 @@ def install(
         console.print(f"Available: {', '.join(TOOLS.keys())}, 'all'")
         raise typer.Exit(code=1)
 
-    pkg = f"revenueholdings[{extras}]"
+    pkg = f"devforge[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
     try:
         result = subprocess.run(
@@ -168,7 +168,7 @@ def _make_dispatch(tool_name: str):
         except FileNotFoundError:
             console.print(
                 f"[red]Tool '{tool_name}' not installed.[/red]\n"
-                f"Install with: [green]pip install revenueholdings[{tool_name}][/green]"
+                f"Install with: [green]pip install devforge[{tool_name}][/green]"
             )
             raise typer.Exit(code=1) from None
 
