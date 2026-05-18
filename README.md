@@ -1,18 +1,18 @@
-﻿# Revenue Holdings CLI
+# Revenue Holdings CLI
 
-[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/revenueholdings?style=social)](https://github.com/Coding-Dev-Tools/revenueholdings/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/devforge?style=social)](https://github.com/Coding-Dev-Tools/devforge/stargazers)
 
-**The `rh` command â€” one install, ten developer CLI tools.**
+**The `rh` command — one install, ten developer CLI tools.**
 
 [![PyPI](https://img.shields.io/pypi/v/revenueholdings)](https://pypi.org/project/revenueholdings/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/revenueholdings)](https://pypi.org/project/revenueholdings/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Ten production-ready CLI tools for API contracts, SQL generation, infrastructure diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal â€” in a single package. Install one meta-package and get immediate access to all tools via the unified `rh` command.
+Ten production-ready CLI tools for API contracts, SQL generation, infrastructure diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal — in a single package. Install one meta-package and get immediate access to all tools via the unified `rh` command.
 
 ---
 
-[ðŸ  Landing Page](https://coding-dev-tools.github.io/revenueholdings.dev/) Â· [ðŸ“ Blog](https://coding-dev-tools.github.io/revenueholdings.dev/blog.html) Â· [ðŸ› Report a Bug](https://github.com/Coding-Dev-Tools/revenueholdings/issues)
+[🏠 Landing Page](https://coding-dev-tools.github.io/revenueholdings.dev/) · [📝 Blog](https://coding-dev-tools.github.io/revenueholdings.dev/blog.html) · [🐛 Report a Bug](https://github.com/Coding-Dev-Tools/devforge/issues)
 
 ---
 
@@ -20,9 +20,9 @@ Ten production-ready CLI tools for API contracts, SQL generation, infrastructure
 
 Instead of installing ten separate tools and learning ten different CLIs, `pip install revenueholdings[all]` gives you:
 
-- **Single CLI** (`rh`) to invoke any tool â€” no context switching
+- **Single CLI** (`rh`) to invoke any tool — no context switching
 - **Consistent flags, output formats, and help** across all tools
-- **Shared configuration** â€” one install, all tools
+- **Shared configuration** — one install, all tools
 
 ## Installation
 
@@ -55,34 +55,34 @@ rh versions            # Show installed tool versions
 Run any tool directly through `rh`:
 
 ```bash
-# API Contract Guardian â€” detect OpenAPI breaking changes
+# API Contract Guardian — detect OpenAPI breaking changes
 rh guard check spec-v1.yaml spec-v2.yaml
 
-# json2sql â€” convert JSON to SQL INSERT statements
+# json2sql — convert JSON to SQL INSERT statements
 rh sql convert data.json --dialect postgres
 
-# DeployDiff â€” preview infrastructure changes with cost estimates
+# DeployDiff — preview infrastructure changes with cost estimates
 rh deploy preview plan.json
 
-# ConfigDrift â€” catch config drift between environments
+# ConfigDrift — catch config drift between environments
 rh drift check dev.yaml prod.yaml
 
-# APIGhost â€” spawn mock API server from OpenAPI spec
+# APIGhost — spawn mock API server from OpenAPI spec
 rh ghost serve openapi.yaml
 
-# APIAuth â€” generate API keys and JWTs
+# APIAuth — generate API keys and JWTs
 rh auth generate --type api-key
 
-# Envault â€” sync .env files across environments
+# Envault — sync .env files across environments
 rh envault diff .env.dev .env.prod
 
-# SchemaForge â€” convert between ORM formats
+# SchemaForge — convert between ORM formats
 rh schema convert schema.prisma --to drizzle
 
-# click-to-mcp â€” wrap CLI as MCP server
+# click-to-mcp — wrap CLI as MCP server
 rh mcp wrap my-cli --transport http
 
-# DeadCode â€” find unused exports in React/Next.js
+# DeadCode — find unused exports in React/Next.js
 rh deadcode scan src/
 ```
 
@@ -97,20 +97,20 @@ rh deadcode scan src/
 | `ghost` | apighost | Mock API server from OpenAPI specs with VCR cassette recording and realistic fake data |
 | `auth` | apiauth | API key and JWT lifecycle management with AES-256-GCM encrypted local store |
 | `envault` | envault | Env variable syncing, diffing, and secret rotation with Vault/AWS SSM/Doppler/1Password support |
-| `schema` | schemaforge | Bidirectional ORM schema converter â€” 11 formats with zero-loss roundtripping |
-| `mcp` | click-to-mcp | Auto-wrap any Click/typer CLI as an MCP server â€” zero code changes |
+| `schema` | schemaforge | Bidirectional ORM schema converter — 11 formats with zero-loss roundtripping |
+| `mcp` | click-to-mcp | Auto-wrap any Click/typer CLI as an MCP server — zero code changes |
 | `deadcode` | deadcode | Detect unused exports, dead routes, orphaned CSS in TypeScript/React/Next.js projects |
 
 ## Links
 
 - [Landing Page](https://coding-dev-tools.github.io/revenueholdings.dev/)
 - [GitHub Organization](https://github.com/Coding-Dev-Tools)
-- [Report an Issue](https://github.com/Coding-Dev-Tools/revenueholdings/issues)
+- [Report an Issue](https://github.com/Coding-Dev-Tools/devforge/issues)
 
 ## License
 
-MIT â€” see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-<sub>Built by [Revenue Holdings](https://coding-dev-tools.github.io/revenueholdings.dev/) â€” autonomous AI agents generating revenue 24/7.</sub>
+<sub>Built by [Revenue Holdings](https://coding-dev-tools.github.io/revenueholdings.dev/) — autonomous AI agents generating revenue 24/7.</sub>
