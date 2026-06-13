@@ -1,6 +1,6 @@
 """DevForge unified CLI entry point."""
 
-import builtins as _builtins
+import importlib.util
 import subprocess
 import sys
 import typer
@@ -88,8 +88,8 @@ def install(
 ):
     """Install a DevForge tool."""
     if tool == "all":
-        targets = _builtins.list(TOOLS.keys())
-        extras = ",".join(TOOLS.keys())
+        targets = list(TOOLS.keys())
+        extras = "all"
     elif tool in TOOLS:
         targets = [tool]
         extras = tool
@@ -124,7 +124,7 @@ def show_versions(
         console.print(f"[red]Unknown tool: {tool}[/red]")
         console.print(f"Available: {', '.join(TOOLS.keys())}")
         raise typer.Exit(code=1)
-    targets = [tool] if tool else _builtins.list(TOOLS.keys())
+    targets = [tool] if tool else list(TOOLS.keys())
 
     for t in targets:
         info = TOOLS[t]
@@ -145,13 +145,17 @@ def show_versions(
             console.print(f"[dim]{t:8}[/dim] [red]error checking[/red]")
 
 
+def _is_tool_installed(module_name: str) -> bool:
+    """Return True if the module (Python package) is importable."""
+    return importlib.util.find_spec(module_name) is not None
+
+
 # Dynamically add subcommands for each tool
 def _make_dispatch(tool_name: str):
     """Create a typer command that dispatches to the underlying tool CLI."""
     pkg = TOOLS[tool_name]["package"]
 
     def dispatch(
-        ctx: typer.Context,
         args: list[str] = typer.Argument(None, help="Arguments to pass to the tool."),  # noqa: B008
     ):
         info = TOOLS.get(tool_name)
@@ -159,18 +163,19 @@ def _make_dispatch(tool_name: str):
             console.print(f"[red]Unknown tool: {tool_name}[/red]")
             raise typer.Exit(code=1)
 
-        try:
-            result = subprocess.run(
-                [sys.executable, "-m", info["package"].replace("-", "_")] + (args or []),
-                capture_output=False,
-            )
-            sys.exit(result.returncode)
-        except FileNotFoundError:
+        module_name = info["package"].replace("-", "_")
+        if not _is_tool_installed(module_name):
             console.print(
-                f"[red]Tool '{tool_name}' not installed.[/red]\n"
-                f"Install with: [green]pip install devforge[{tool_name}][/green]"
+                f"[red]Tool '{tool_name}' is not installed.[/red]\n"
+                f"Run: [green]pip install devforge\\[{tool_name}][/green]"
             )
-            raise typer.Exit(code=1) from None
+            raise typer.Exit(code=1)
+
+        result = subprocess.run(
+            [sys.executable, "-m", module_name] + (args or []),
+            capture_output=False,
+        )
+        sys.exit(result.returncode)
 
     dispatch.__name__ = tool_name
     dispatch.__doc__ = f"Run `{pkg}` commands via the {tool_name} subcommand."
