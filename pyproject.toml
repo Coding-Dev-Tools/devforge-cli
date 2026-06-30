@@ -50,7 +50,7 @@ all = [
     "click-to-mcp>=0.4.0",
     "deadcode>=0.1.1",
 ]
-dev = ["pytest>=7.0.0"]
+dev = ["pytest>=7.0.0", "pyright>=1.1.300"]
 
 [project.urls]
 Homepage = "https://github.com/Coding-Dev-Tools/devforge"

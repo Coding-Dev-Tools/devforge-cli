@@ -21,33 +21,105 @@ jobs:
       - name: Run release audit
         run: |
           python3 - <<'PY'
-          import json, os, pathlib, sys
+          import json, pathlib, sys
 
-          repo = pathlib.Path.cwd().name
-          scorecard = {"overall_grade": "A", "angles_passing": 8, "angles_total": 8, "blockers": 0, "angles": []}
-          angles = [
-            ("README", "A"),
-            ("License", "A"),
-            ("CI/CD", "A"),
-            ("Dependencies", "A"),
-            ("Tests", "A"),
-            ("Versioning", "A"),
-            ("Changelog", "A"),
-            ("Security", "A"),
-          ]
-          for name, grade in angles:
-              scorecard["angles"].append({"angle": name, "grade": grade})
+          repo = pathlib.Path.cwd()
+          scorecard = {"overall_grade": "A", "angles_passing": 0, "angles_total": 8, "blockers": 0, "angles": []}
 
-          out_dir = pathlib.Path("scorecard")
+          def check(name, grade, detail):
+              scorecard["angles"].append({"angle": name, "grade": grade, "detail": detail})
+              if grade == "A":
+                  scorecard["angles_passing"] += 1
+              elif grade == "F":
+                  scorecard["blockers"] += 1
+
+          # 1. README
+          readme = repo / "README.md"
+          if readme.exists() and len(readme.read_text()) > 200:
+              check("README", "A", "README.md exists and has content")
+          else:
+              check("README", "F", "README.md missing or too short")
+
+          # 2. License
+          lic = repo / "LICENSE"
+          if lic.exists() and len(lic.read_text()) > 100:
+              check("License", "A", "LICENSE file present")
+          else:
+              check("License", "F", "LICENSE file missing or too short")
+
+          # 3. CI/CD
+          wf_dir = repo / ".github" / "workflows"
+          wf_files = list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))
+          if len(wf_files) >= 1:
+              check("CI/CD", "A", f"{len(wf_files)} workflow(s) found")
+          else:
+              check("CI/CD", "F", "No CI/CD workflows found")
+
+          # 4. Dependencies
+          pyproj = repo / "pyproject.toml"
+          if pyproj.exists():
+              check("Dependencies", "A", "pyproject.toml found")
+          else:
+              check("Dependencies", "F", "pyproject.toml missing")
+
+          # 5. Tests
+          tests = repo / "tests"
+          test_files = list(tests.glob("test_*.py")) + list(tests.glob("*_test.py"))
+          if len(test_files) >= 1:
+              check("Tests", "A", f"{len(test_files)} test file(s) found")
+          else:
+              check("Tests", "F", "No test files found")
+
+          # 6. Versioning
+          if pyproj.exists():
+              import tomllib
+              data = tomllib.loads(pyproj.read_text())
+              ver = data.get("project", {}).get("version", "")
+              if ver:
+                  check("Versioning", "A", f"Version {ver} set in pyproject.toml")
+              else:
+                  check("Versioning", "F", "No version in pyproject.toml")
+          else:
+              check("Versioning", "F", "Cannot check version — pyproject.toml missing")
+
+          # 7. Changelog
+          changelog = repo / "CHANGELOG.md"
+          if changelog.exists() and len(changelog.read_text()) > 50:
+              check("Changelog", "A", "CHANGELOG.md present")
+          else:
+              check("Changelog", "C", "CHANGELOG.md missing or too short")
+
+          # 8. Security
+          sec = repo / "SECURITY.md"
+          if sec.exists() and len(sec.read_text()) > 50:
+              check("Security", "A", "SECURITY.md present")
+          else:
+              check("Security", "C", "SECURITY.md missing or too short")
+
+          # Compute overall grade
+          if scorecard["blockers"] > 0:
+              scorecard["overall_grade"] = "F"
+          elif scorecard["angles_passing"] == scorecard["angles_total"]:
+              scorecard["overall_grade"] = "A"
+          elif scorecard["angles_passing"] >= scorecard["angles_total"] - 2:
+              scorecard["overall_grade"] = "B"
+          else:
+              scorecard["overall_grade"] = "C"
+
+          out_dir = repo / "scorecard"
           out_dir.mkdir(exist_ok=True)
-          (out_dir / f"{repo}.json").write_text(json.dumps(scorecard, indent=2))
+          (out_dir / f"{repo.name}.json").write_text(json.dumps(scorecard, indent=2))
 
           print("## Release Audit (8 angles)")
           print()
-          print(f"**Overall grade: {scorecard['overall_grade']}** ({scorecard['angles_passing']}/{scorecard['angles_total']} angles passing)")
+          print(f"**Overall grade: {scorecard['overall_grade']}** ({scorecard['angles_passing']}/{scorecard['angles_total']} angles passing, {scorecard['blockers']} blocker(s))")
           print()
-          print("| Angle | Grade |")
-          print("|-------|-------|")
+          print("| Angle | Grade | Detail |")
+          print("|-------|-------|--------|")
           for a in scorecard["angles"]:
-              print(f"| {a['angle']} | {a['grade']} |")
+              print(f"| {a['angle']} | {a['grade']} | {a['detail']} |")
+
+          if scorecard["blockers"] > 0:
+              print(f"\n::error::{scorecard['blockers']} release-blocker angle(s) — see audit output above")
+              sys.exit(1)
           PY
