@@ -54,7 +54,7 @@ dev = ["pytest>=7.0.0"]
 [project.urls]
 Homepage = "https://github.com/Coding-Dev-Tools/devforge"
 Repository = "https://github.com/Coding-Dev-Tools/devforge"
-"Issue Tracker" = "https://github.com/Coding-Dev-Tools/devforge/issues"
+Issues = "https://github.com/Coding-Dev-Tools/devforge/issues"
 
 [project.scripts]
 devforge = "devforge.cli:app"
