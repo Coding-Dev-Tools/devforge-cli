@@ -8,7 +8,7 @@ format:
 	ruff format .
 
 typecheck:
-	echo "no type-checker"
+	pyright src/
 
 test:
 	pytest -q
