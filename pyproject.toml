@@ -3,14 +3,14 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "devforge"
+name = "devforge-tools"
 version = "0.3.0"
 description = "Unified CLI for 10 developer tools: API contracts, SQL generation, infra diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "DevForge"}]
-keywords = ["devforge", "cli", "devops", "developer-tools", "api-contract", "openapi", "json-to-sql", "infrastructure", "terraform", "cloudformation", "config-drift", "devsecops", "mocking", "api-keys", "env", "schema", "mcp", "dead-code"]
+keywords = ["devforge-tools", "devforge", "cli", "devops", "developer-tools", "api-contract", "openapi", "json-to-sql", "infrastructure", "terraform", "cloudformation", "config-drift", "devsecops", "mocking", "api-keys", "env", "schema", "mcp", "dead-code"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -26,7 +26,7 @@ dependencies = [
     "rich>=13.0.0",
 ]
 
-# Optional groups â€” install with: pip install devforge[all]
+# Optional groups — install with: pip install devforge-tools[all]
 [project.optional-dependencies]
 guard = ["api-contract-guardian>=0.1.0"]
 sql = ["json2sql>=0.1.0"]
@@ -53,9 +53,9 @@ all = [
 dev = ["pytest>=7.0.0", "pyright>=1.1.300"]
 
 [project.urls]
-Homepage = "https://github.com/Coding-Dev-Tools/devforge"
-Repository = "https://github.com/Coding-Dev-Tools/devforge"
-Issues = "https://github.com/Coding-Dev-Tools/devforge/issues"
+Homepage = "https://github.com/Coding-Dev-Tools/devforge-tools"
+Repository = "https://github.com/Coding-Dev-Tools/devforge-tools"
+Issues = "https://github.com/Coding-Dev-Tools/devforge-tools/issues"
 
 [project.scripts]
 devforge = "devforge.cli:app"
@@ -66,6 +66,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v --tb=short"
+pythonpath = ["src"]
 [tool.ruff]
 target-version = "py310"
 line-length = 120
