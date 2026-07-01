@@ -82,9 +82,7 @@ def list_tools(
 
 @app.command()
 def install(
-    tool: str = typer.Argument(
-        ..., help="Tool to install: " + ", ".join(TOOLS.keys()) + ", or 'all'"
-    ),
+    tool: str = typer.Argument(..., help="Tool to install: " + ", ".join(TOOLS.keys()) + ", or 'all'"),
 ):
     """Install a DevForge tool."""
     if tool == "all":
@@ -101,10 +99,7 @@ def install(
     pkg = f"devforge[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
     try:
-        result = subprocess.run(
-            [sys.executable, "-m", "pip", "install", pkg],
-            capture_output=True, text=True
-        )
+        result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
         if result.returncode == 0:
             console.print(f"[green]Successfully installed:[/green] {', '.join(targets)}")
         else:
@@ -130,8 +125,7 @@ def show_versions(
         info = TOOLS[t]
         try:
             result = subprocess.run(
-                [sys.executable, "-m", "pip", "show", info["package"]],
-                capture_output=True, text=True
+                [sys.executable, "-m", "pip", "show", info["package"]], capture_output=True, text=True
             )
             if result.returncode == 0:
                 for line in result.stdout.splitlines():

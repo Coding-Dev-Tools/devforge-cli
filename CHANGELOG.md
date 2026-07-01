@@ -5,6 +5,16 @@ All notable changes to Revenue Holdings CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-06-30
+
+### Added
+- Python 3.13 to CI test matrix
+- Formatting check step in CI workflow
+- `format-check` Makefile target
+
+### Changed
+- Makefile lint/format targets scoped to `src/ tests/` instead of entire repo
+
 ## [0.2.0] - 2026-05-17
 
 ### Added
