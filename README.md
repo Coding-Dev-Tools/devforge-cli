@@ -18,7 +18,7 @@ Ten production-ready CLI tools for API contracts, SQL generation, infrastructure
 
 ## Why the Suite?
 
-Instead of installing ten separate tools and learning ten different CLIs, `pip install devforge[all]` gives you:
+Instead of installing ten separate tools and learning ten different CLIs, `pip install devforge-tools[all]` gives you:
 
 - **Single CLI** (`devforge`) to invoke any tool — no context switching
 - **Consistent flags, output formats, and help** across all tools
@@ -28,19 +28,19 @@ Instead of installing ten separate tools and learning ten different CLIs, `pip i
 
 ```bash
 # Install everything (recommended)
-pip install devforge[all]
+pip install devforge-tools[all]
 
 # Or install individual tools
-pip install devforge[guard]    # API Contract Guardian
-pip install devforge[sql]      # json2sql
-pip install devforge[deploy]   # DeployDiff
-pip install devforge[drift]    # ConfigDrift
-pip install devforge[ghost]    # APIGhost
-pip install devforge[auth]     # APIAuth
-pip install devforge[envault]  # Envault
-pip install devforge[schema]   # SchemaForge
-pip install devforge[mcp]      # click-to-mcp
-pip install devforge[deadcode] # DeadCode
+pip install devforge-tools[guard]    # API Contract Guardian
+pip install devforge-tools[sql]      # json2sql
+pip install devforge-tools[deploy]   # DeployDiff
+pip install devforge-tools[drift]    # ConfigDrift
+pip install devforge-tools[ghost]    # APIGhost
+pip install devforge-tools[auth]     # APIAuth
+pip install devforge-tools[envault]  # Envault
+pip install devforge-tools[schema]   # SchemaForge
+pip install devforge-tools[mcp]      # click-to-mcp
+pip install devforge-tools[deadcode] # DeadCode
 ```
 
 ## Usage
