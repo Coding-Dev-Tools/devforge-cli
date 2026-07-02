@@ -155,10 +155,27 @@ def _make_dispatch(tool_name: str):
         try:
             result = subprocess.run(
                 [sys.executable, "-m", info["package"].replace("-", "_")] + (args or []),
-                capture_output=False,
+                capture_output=True,
+                text=True,
             )
+            if result.returncode == 0:
+                sys.stdout.write(result.stdout)
+                if result.stderr:
+                    sys.stderr.write(result.stderr)
+                sys.exit(0)
+            # Module not found — show friendly install message
+            if "No module named" in result.stderr:
+                console.print(
+                    f"[red]Tool '{tool_name}' not installed.[/red]\n"
+                    f"Install with: [green]pip install devforge-tools[{tool_name}][/green]"
+                )
+                raise typer.Exit(code=1) from None
+            # Tool ran but failed — show its output and propagate exit code
+            sys.stdout.write(result.stdout)
+            sys.stderr.write(result.stderr)
             sys.exit(result.returncode)
         except FileNotFoundError:
+            # Only reached if sys.executable itself is missing (extremely rare)
             console.print(
                 f"[red]Tool '{tool_name}' not installed.[/red]\n"
                 f"Install with: [green]pip install devforge-tools[{tool_name}][/green]"
