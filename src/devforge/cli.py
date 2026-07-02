@@ -75,8 +75,8 @@ def list_tools(
             )
 
         console.print(table)
-        console.print("\n[dim]Install individually:[/dim] [green]pip install devforge-tools[guard][/green]")
-        console.print("[dim]Install all:[/dim] [green]pip install devforge-tools[all][/green]")
+        console.print("\n[dim]Install individually:[/dim] [green]pip install devforge[guard][/green]")
+        console.print("[dim]Install all:[/dim] [green]pip install devforge[all][/green]")
 
 
 @app.command()
@@ -95,7 +95,7 @@ def install(
         console.print(f"Available: {', '.join(TOOLS.keys())}, 'all'")
         raise typer.Exit(code=1)
 
-    pkg = f"devforge-tools[{extras}]"
+    pkg = f"devforge[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
     try:
         result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
@@ -167,7 +167,7 @@ def _make_dispatch(tool_name: str):
             if "No module named" in result.stderr:
                 console.print(
                     f"[red]Tool '{tool_name}' not installed.[/red]\n"
-                    f"Install with: [green]pip install devforge-tools[{tool_name}][/green]"
+                    f"Install with: [green]pip install devforge[{tool_name}][/green]"
                 )
                 raise typer.Exit(code=1) from None
             # Tool ran but failed — show its output and propagate exit code
@@ -178,7 +178,7 @@ def _make_dispatch(tool_name: str):
             # Only reached if sys.executable itself is missing (extremely rare)
             console.print(
                 f"[red]Tool '{tool_name}' not installed.[/red]\n"
-                f"Install with: [green]pip install devforge-tools[{tool_name}][/green]"
+                f"Install with: [green]pip install devforge[{tool_name}][/green]"
             )
             raise typer.Exit(code=1) from None
 
