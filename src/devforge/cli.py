@@ -181,6 +181,9 @@ def _make_dispatch(tool_name: str):
                 f"Install with: [green]pip install devforge[{tool_name}][/green]"
             )
             raise typer.Exit(code=1) from None
+        except Exception as e:
+            console.print(f"[red]Unexpected error running '{tool_name}': {e}[/red]")
+            raise typer.Exit(code=1) from e
 
     dispatch.__name__ = tool_name
     dispatch.__doc__ = f"Run `{pkg}` commands via the {tool_name} subcommand."
