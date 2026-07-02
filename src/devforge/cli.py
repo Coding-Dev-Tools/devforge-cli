@@ -1,6 +1,5 @@
 """DevForge unified CLI entry point."""
 
-import builtins as _builtins
 import subprocess
 import sys
 import typer
@@ -86,7 +85,7 @@ def install(
 ):
     """Install a DevForge tool."""
     if tool == "all":
-        targets = _builtins.list(TOOLS.keys())
+        targets = list(TOOLS.keys())
         extras = ",".join(TOOLS.keys())
     elif tool in TOOLS:
         targets = [tool]
@@ -119,7 +118,7 @@ def show_versions(
         console.print(f"[red]Unknown tool: {tool}[/red]")
         console.print(f"Available: {', '.join(TOOLS.keys())}")
         raise typer.Exit(code=1)
-    targets = [tool] if tool else _builtins.list(TOOLS.keys())
+    targets = [tool] if tool else list(TOOLS.keys())
 
     for t in targets:
         info = TOOLS[t]
