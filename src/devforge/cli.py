@@ -96,7 +96,7 @@ def install(
         console.print(f"Available: {', '.join(TOOLS.keys())}, 'all'")
         raise typer.Exit(code=1)
 
-    pkg = f"devforge[{extras}]"
+    pkg = f"devforge-tools[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
     try:
         result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
