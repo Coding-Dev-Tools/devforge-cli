@@ -4,8 +4,8 @@
 DevForge CLI meta-package that installs all 11 developer tools in one command. Provides a unified `devforge` CLI entry point delegating to sub-tools: api-contract-guardian, json2sql, deploydiff, configdrift, apighost, apiauth, envault, schemaforge, click-to-mcp, and deadcode.
 
 ## Build & Test Commands
-- Install: `pip install -e .[all]` or `pip install devforge`
-- Install all tools: `pip install devforge[all]`
+- Install: `pip install -e .[all]` or `pip install devforge-tools`
+- Install all tools: `pip install devforge-tools[all]`
 - Test: `pytest tests/` (or `python -m pytest tests/ -v --tb=short`)
 - Lint: `ruff check .`
 - Build: `pip install build twine && python -m build && twine check dist/*`
