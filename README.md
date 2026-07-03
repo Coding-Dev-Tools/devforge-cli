@@ -110,3 +110,9 @@ devforge deadcode scan src/
 ## License
 
 MIT — see [LICENSE](LICENSE) for details.
+
+## Test
+
+```bash
+pytest -q
+```

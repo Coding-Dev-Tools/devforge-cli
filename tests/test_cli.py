@@ -1,4 +1,5 @@
 """Tests for devforge meta-package."""
+
 from __future__ import annotations
 
 from devforge import TOOLS, __version__
@@ -86,9 +87,7 @@ class TestVersionsCommand:
     @mock.patch("devforge.cli.subprocess.run")
     def test_versions_specific_tool_not_installed(self, mock_run):
         """Show 'not installed' for a tool that isn't installed."""
-        mock_run.return_value = mock.MagicMock(
-            returncode=1, stdout="", stderr=""
-        )
+        mock_run.return_value = mock.MagicMock(returncode=1, stdout="", stderr="")
         result = runner.invoke(app, ["versions", "guard"])
         assert result.exit_code == 0
         assert "guard" in result.stdout
