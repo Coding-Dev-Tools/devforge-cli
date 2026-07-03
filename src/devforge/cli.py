@@ -1,6 +1,5 @@
 """DevForge unified CLI entry point."""
 
-import builtins as _builtins
 import subprocess
 import sys
 import typer
@@ -86,7 +85,7 @@ def install(
 ):
     """Install a DevForge tool."""
     if tool == "all":
-        targets = _builtins.list(TOOLS.keys())
+        targets = list(TOOLS.keys())
         extras = ",".join(TOOLS.keys())
     elif tool in TOOLS:
         targets = [tool]
@@ -119,7 +118,7 @@ def show_versions(
         console.print(f"[red]Unknown tool: {tool}[/red]")
         console.print(f"Available: {', '.join(TOOLS.keys())}")
         raise typer.Exit(code=1)
-    targets = [tool] if tool else _builtins.list(TOOLS.keys())
+    targets = [tool] if tool else list(TOOLS.keys())
 
     for t in targets:
         info = TOOLS[t]
@@ -156,15 +155,35 @@ def _make_dispatch(tool_name: str):
         try:
             result = subprocess.run(
                 [sys.executable, "-m", info["package"].replace("-", "_")] + (args or []),
-                capture_output=False,
+                capture_output=True,
+                text=True,
             )
+            if result.returncode == 0:
+                sys.stdout.write(result.stdout)
+                if result.stderr:
+                    sys.stderr.write(result.stderr)
+                sys.exit(0)
+            # Module not found — show friendly install message
+            if "No module named" in result.stderr:
+                console.print(
+                    f"[red]Tool '{tool_name}' not installed.[/red]\n"
+                    f"Install with: [green]pip install devforge[{tool_name}][/green]"
+                )
+                raise typer.Exit(code=1) from None
+            # Tool ran but failed — show its output and propagate exit code
+            sys.stdout.write(result.stdout)
+            sys.stderr.write(result.stderr)
             sys.exit(result.returncode)
         except FileNotFoundError:
+            # Only reached if sys.executable itself is missing (extremely rare)
             console.print(
                 f"[red]Tool '{tool_name}' not installed.[/red]\n"
                 f"Install with: [green]pip install devforge-tools[{tool_name}][/green]"
             )
             raise typer.Exit(code=1) from None
+        except Exception as e:
+            console.print(f"[red]Unexpected error running '{tool_name}': {e}[/red]")
+            raise typer.Exit(code=1) from e
 
     dispatch.__name__ = tool_name
     dispatch.__doc__ = f"Run `{pkg}` commands via the {tool_name} subcommand."
