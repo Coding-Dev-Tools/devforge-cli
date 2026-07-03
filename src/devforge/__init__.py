@@ -1,6 +1,6 @@
 """DevForge — unified CLI for all developer tools."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 # Tool registry: name -> (package, description, icon, pricing)
 TOOLS = {
