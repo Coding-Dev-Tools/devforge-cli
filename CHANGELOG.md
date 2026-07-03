@@ -1,3 +1,9 @@
+## [0.4.0] - 2026-06-30
+
+### Changed
+- Renamed PyPI package from `devforge` to `devforge-tools` (name `devforge` was squatted on PyPI)
+- Updated all URLs, badges, and references to point to `devforge-tools`
+
 # Changelog
 
 All notable changes to Revenue Holdings CLI will be documented in this file.
