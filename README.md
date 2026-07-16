@@ -4,8 +4,6 @@
 
 **The `devforge` command — one install, ten developer CLI tools.**
 
-[![PyPI](https://img.shields.io/pypi/v/devforge-tools)](https://pypi.org/project/devforge-tools/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/devforge-tools)](https://pypi.org/project/devforge-tools/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Ten production-ready CLI tools for API contracts, SQL generation, infrastructure diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal — in a single package. Install one meta-package and get immediate access to all tools via the unified `devforge` command.
@@ -18,7 +16,7 @@ Ten production-ready CLI tools for API contracts, SQL generation, infrastructure
 
 ## Why the Suite?
 
-Instead of installing ten separate tools and learning ten different CLIs, `pip install devforge-tools[all]` gives you:
+Instead of installing ten separate tools and learning ten different CLIs, the `devforge` meta-package gives you:
 
 - **Single CLI** (`devforge`) to invoke any tool — no context switching
 - **Consistent flags, output formats, and help** across all tools
@@ -26,22 +24,19 @@ Instead of installing ten separate tools and learning ten different CLIs, `pip i
 
 ## Installation
 
+> **Install note:** `devforge-tools` is **not published on public PyPI**. Install it directly from the GitHub source with the `git+` form below (the only verified-working pip path right now).
+
 ```bash
 # Install everything (recommended)
-pip install devforge-tools[all]
+pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]"
 
-# Or install individual tools
-pip install devforge-tools[guard]    # API Contract Guardian
-pip install devforge-tools[sql]      # json2sql
-pip install devforge-tools[deploy]   # DeployDiff
-pip install devforge-tools[drift]    # ConfigDrift
-pip install devforge-tools[ghost]    # APIGhost
-pip install devforge-tools[auth]     # APIAuth
-pip install devforge-tools[envault]  # Envault
-pip install devforge-tools[schema]   # SchemaForge
-pip install devforge-tools[mcp]      # click-to-mcp
-pip install devforge-tools[deadcode] # DeadCode
+# Or clone and install locally
+git clone https://github.com/Coding-Dev-Tools/devforge-cli.git
+cd devforge-cli
+pip install -e ".[all]"
 ```
+
+Each tool can also be installed on its own from its own repo (e.g. `pip install git+https://github.com/Coding-Dev-Tools/apighost.git`). See each tool's README for details.
 
 ## Usage
 
