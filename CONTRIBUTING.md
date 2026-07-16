@@ -5,7 +5,7 @@ Thank you for your interest in contributing!
 ## Development Setup
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/revenueholdings.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/devforge-cli.git`
 3. Create a virtual environment: `python -m venv venv`
 4. Install dev dependencies: `pip install -e ".[dev]"`
 

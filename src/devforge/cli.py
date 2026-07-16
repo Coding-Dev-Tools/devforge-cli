@@ -76,15 +76,13 @@ def list_tools(
             )
 
         console.print(table)
-        console.print("\n[dim]Install individually:[/dim] [green]pip install devforge[guard][/green]")
-        console.print("[dim]Install all:[/dim] [green]pip install devforge[all][/green]")
+        console.print("\n[dim]Install individually:[/dim] [green]pip install devforge-tools[guard][/green]")
+        console.print("[dim]Install all:[/dim] [green]pip install devforge-tools[all][/green]")
 
 
 @app.command()
 def install(
-    tool: str = typer.Argument(
-        ..., help="Tool to install: " + ", ".join(TOOLS.keys()) + ", or 'all'"
-    ),
+    tool: str = typer.Argument(..., help="Tool to install: " + ", ".join(TOOLS.keys()) + ", or 'all'"),
 ):
     """Install a DevForge tool."""
     if tool == "all":
@@ -98,13 +96,10 @@ def install(
         console.print(f"Available: {', '.join(TOOLS.keys())}, 'all'")
         raise typer.Exit(code=1)
 
-    pkg = f"devforge[{extras}]"
+    pkg = f"devforge-tools[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
     try:
-        result = subprocess.run(
-            [sys.executable, "-m", "pip", "install", pkg],
-            capture_output=True, text=True
-        )
+        result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
         if result.returncode == 0:
             console.print(f"[green]Successfully installed:[/green] {', '.join(targets)}")
         else:
@@ -130,8 +125,7 @@ def show_versions(
         info = TOOLS[t]
         try:
             result = subprocess.run(
-                [sys.executable, "-m", "pip", "show", info["package"]],
-                capture_output=True, text=True
+                [sys.executable, "-m", "pip", "show", info["package"]], capture_output=True, text=True
             )
             if result.returncode == 0:
                 for line in result.stdout.splitlines():
@@ -167,14 +161,19 @@ def _make_dispatch(tool_name: str):
         if not _is_tool_installed(module_name):
             console.print(
                 f"[red]Tool '{tool_name}' is not installed.[/red]\n"
-                f"Run: [green]pip install devforge\\[{tool_name}][/green]"
+                f"Run: [green]pip install devforge-tools\\[{tool_name}][/green]"
             )
             raise typer.Exit(code=1)
 
         result = subprocess.run(
             [sys.executable, "-m", module_name] + (args or []),
-            capture_output=False,
+            capture_output=True,
+            text=True,
         )
+        if result.stdout:
+            sys.stdout.write(result.stdout)
+        if result.stderr:
+            sys.stderr.write(result.stderr)
         sys.exit(result.returncode)
 
     dispatch.__name__ = tool_name

@@ -1,8 +1,9 @@
 """Tests for devforge meta-package."""
+
 from __future__ import annotations
 
 from devforge import TOOLS, __version__
-from devforge.cli import app, _is_tool_installed
+from devforge.cli import _is_tool_installed, app
 from typer.testing import CliRunner
 from unittest import mock
 
@@ -48,16 +49,16 @@ class TestInstallCommand:
 
     @mock.patch("devforge.cli.subprocess.run")
     def test_install_all_uses_all_extra(self, mock_run):
-        """'install all' must use the canonical devforge[all] extra, not a comma-joined list."""
+        """'install all' must use the canonical devforge-tools[all] extra, not a comma-joined list."""
         mock_run.return_value = mock.MagicMock(returncode=0, stdout="", stderr="")
         result = runner.invoke(app, ["install", "all"])
         assert result.exit_code == 0
         assert "Successfully" in result.stdout
         mock_run.assert_called_once()
         call_args = mock_run.call_args[0][0]  # positional arg: the command list
-        # Must contain "devforge[all]", not "devforge[guard,sql,...]"
-        pkg_arg = next((a for a in call_args if a.startswith("devforge[")), None)
-        assert pkg_arg == "devforge[all]", f"Expected devforge[all], got {pkg_arg}"
+        # Must contain "devforge-tools[all]", not "devforge-tools[guard,sql,...]"
+        pkg_arg = next((a for a in call_args if a.startswith("devforge-tools[")), None)
+        assert pkg_arg == "devforge-tools[all]", f"Expected devforge-tools[all], got {pkg_arg}"
 
     def test_install_unknown_tool(self):
         """Error on unknown tool name."""
@@ -90,9 +91,7 @@ class TestVersionsCommand:
     @mock.patch("devforge.cli.subprocess.run")
     def test_versions_specific_tool_not_installed(self, mock_run):
         """Show 'not installed' for a tool that isn't installed."""
-        mock_run.return_value = mock.MagicMock(
-            returncode=1, stdout="", stderr=""
-        )
+        mock_run.return_value = mock.MagicMock(returncode=1, stdout="", stderr="")
         result = runner.invoke(app, ["versions", "guard"])
         assert result.exit_code == 0
         assert "guard" in result.stdout
@@ -122,7 +121,7 @@ class TestDispatchCommands:
         result = runner.invoke(app, ["guard"])
         assert result.exit_code == 1
         assert "not installed" in result.stdout
-        assert "pip install devforge[guard]" in result.stdout
+        assert "pip install devforge-tools[guard]" in result.stdout
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
     @mock.patch("devforge.cli.subprocess.run")
@@ -134,6 +133,18 @@ class TestDispatchCommands:
         mock_run.assert_called_once()
         cmd = mock_run.call_args[0][0]
         assert "api_contract_guardian" in cmd
+
+
+    @mock.patch("devforge.cli._is_tool_installed", return_value=False)
+    def test_dispatch_install_hint_escapes_extra_brackets(self, _mock):
+        """The '[tool]' extra in the install hint must survive rich markup parsing.
+
+        A regression guard: an unescaped '[guard]' was previously swallowed by
+        rich's markup parser, rendering 'pip install devforge' with no extra.
+        """
+        result = runner.invoke(app, ["guard"])
+        assert result.exit_code == 1
+        assert "pip install devforge-tools[guard]" in result.stdout
 
 
 class TestHelp:

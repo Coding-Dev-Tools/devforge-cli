@@ -1,24 +1,24 @@
-# DevForge CLI
+# DevForge Tools CLI
 
-[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/devforge?style=social)](https://github.com/Coding-Dev-Tools/devforge/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/devforge-tools?style=social)](https://github.com/Coding-Dev-Tools/devforge-tools/stargazers)
 
 **The `devforge` command — one install, ten developer CLI tools.**
 
-[![PyPI](https://img.shields.io/pypi/v/devforge)](https://pypi.org/project/devforge/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/devforge)](https://pypi.org/project/devforge/)
+[![PyPI](https://img.shields.io/pypi/v/devforge-tools)](https://pypi.org/project/devforge-tools/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/devforge-tools)](https://pypi.org/project/devforge-tools/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Ten production-ready CLI tools for API contracts, SQL generation, infrastructure diffs, config drift, API mocking, key management, env syncing, schema conversion, MCP servers, and dead code removal — in a single package. Install one meta-package and get immediate access to all tools via the unified `devforge` command.
 
 ---
 
-[🏠 Landing Page](https://coding-dev-tools.github.io/devforge/) · [📝 Blog](https://coding-dev-tools.github.io/devforge/blog.html) · [🐛 Report a Bug](https://github.com/Coding-Dev-Tools/devforge/issues)
+[🏠 Landing Page](https://coding-dev-tools.github.io/devforge-tools/) · [📝 Blog](https://coding-dev-tools.github.io/devforge-tools/blog.html) · [🐛 Report a Bug](https://github.com/Coding-Dev-Tools/devforge-tools/issues)
 
 ---
 
 ## Why the Suite?
 
-Instead of installing ten separate tools and learning ten different CLIs, `pip install devforge[all]` gives you:
+Instead of installing ten separate tools and learning ten different CLIs, `pip install devforge-tools[all]` gives you:
 
 - **Single CLI** (`devforge`) to invoke any tool — no context switching
 - **Consistent flags, output formats, and help** across all tools
@@ -28,19 +28,19 @@ Instead of installing ten separate tools and learning ten different CLIs, `pip i
 
 ```bash
 # Install everything (recommended)
-pip install devforge[all]
+pip install devforge-tools[all]
 
 # Or install individual tools
-pip install devforge[guard]    # API Contract Guardian
-pip install devforge[sql]      # json2sql
-pip install devforge[deploy]   # DeployDiff
-pip install devforge[drift]    # ConfigDrift
-pip install devforge[ghost]    # APIGhost
-pip install devforge[auth]     # APIAuth
-pip install devforge[envault]  # Envault
-pip install devforge[schema]   # SchemaForge
-pip install devforge[mcp]      # click-to-mcp
-pip install devforge[deadcode] # DeadCode
+pip install devforge-tools[guard]    # API Contract Guardian
+pip install devforge-tools[sql]      # json2sql
+pip install devforge-tools[deploy]   # DeployDiff
+pip install devforge-tools[drift]    # ConfigDrift
+pip install devforge-tools[ghost]    # APIGhost
+pip install devforge-tools[auth]     # APIAuth
+pip install devforge-tools[envault]  # Envault
+pip install devforge-tools[schema]   # SchemaForge
+pip install devforge-tools[mcp]      # click-to-mcp
+pip install devforge-tools[deadcode] # DeadCode
 ```
 
 ## Usage
@@ -103,10 +103,16 @@ devforge deadcode scan src/
 
 ## Links
 
-- [Landing Page](https://coding-dev-tools.github.io/devforge/)
+- [Landing Page](https://coding-dev-tools.github.io/devforge-tools/)
 - [GitHub Organization](https://github.com/Coding-Dev-Tools)
-- [Report an Issue](https://github.com/Coding-Dev-Tools/devforge/issues)
+- [Report an Issue](https://github.com/Coding-Dev-Tools/devforge-tools/issues)
 
 ## License
 
 MIT — see [LICENSE](LICENSE) for details.
+
+## Test
+
+```bash
+pytest -q
+```
