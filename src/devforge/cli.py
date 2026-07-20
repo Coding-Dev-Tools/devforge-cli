@@ -1,5 +1,6 @@
 """DevForge unified CLI entry point."""
 
+import importlib.util
 import subprocess
 import sys
 import typer
@@ -86,7 +87,7 @@ def install(
     """Install a DevForge tool."""
     if tool == "all":
         targets = list(TOOLS.keys())
-        extras = ",".join(TOOLS.keys())
+        extras = "all"
     elif tool in TOOLS:
         targets = [tool]
         extras = tool
@@ -138,60 +139,55 @@ def show_versions(
             console.print(f"[dim]{t:8}[/dim] [red]error checking[/red]")
 
 
+def _is_tool_installed(module_name: str) -> bool:
+    """Return True if the module (Python package) is importable."""
+    return importlib.util.find_spec(module_name) is not None
+
+
 # Dynamically add subcommands for each tool
 def _make_dispatch(tool_name: str):
     """Create a typer command that dispatches to the underlying tool CLI."""
     pkg = TOOLS[tool_name]["package"]
 
-    def dispatch(
-        ctx: typer.Context,
-        args: list[str] = typer.Argument(None, help="Arguments to pass to the tool."),  # noqa: B008
-    ):
+    def dispatch(ctx: typer.Context):
         info = TOOLS.get(tool_name)
         if not info:
             console.print(f"[red]Unknown tool: {tool_name}[/red]")
             raise typer.Exit(code=1)
 
-        try:
-            result = subprocess.run(
-                [sys.executable, "-m", info["package"].replace("-", "_")] + (args or []),
-                capture_output=True,
-                text=True,
-            )
-            if result.returncode == 0:
-                sys.stdout.write(result.stdout)
-                if result.stderr:
-                    sys.stderr.write(result.stderr)
-                sys.exit(0)
-            # Module not found — show friendly install message
-            if "No module named" in result.stderr:
-                console.print(
-                    f"[red]Tool '{tool_name}' not installed.[/red]\n"
-                    f"Install with: [green]pip install devforge[{tool_name}][/green]"
-                )
-                raise typer.Exit(code=1) from None
-            # Tool ran but failed — show its output and propagate exit code
-            sys.stdout.write(result.stdout)
-            sys.stderr.write(result.stderr)
-            sys.exit(result.returncode)
-        except FileNotFoundError:
-            # Only reached if sys.executable itself is missing (extremely rare)
+        module_name = info["package"].replace("-", "_")
+        if not _is_tool_installed(module_name):
             console.print(
-                f"[red]Tool '{tool_name}' not installed.[/red]\n"
-                f"Install with: [green]pip install devforge-tools[{tool_name}][/green]"
+                f"[red]Tool '{tool_name}' is not installed.[/red]\n"
+                f"Run: [green]pip install devforge-tools\\[{tool_name}][/green]"
             )
-            raise typer.Exit(code=1) from None
-        except Exception as e:
-            console.print(f"[red]Unexpected error running '{tool_name}': {e}[/red]")
-            raise typer.Exit(code=1) from e
+            raise typer.Exit(code=1)
+
+        # `ignore_unknown_options` + `allow_extra_args` let tool flags (e.g.
+        # `--config file.yaml`) reach the underlying CLI instead of being
+        # rejected by typer as "No such option".
+        forwarded = list(ctx.args)
+        result = subprocess.run(
+            [sys.executable, "-m", module_name] + forwarded,
+            capture_output=True,
+            text=True,
+        )
+        if result.stdout:
+            sys.stdout.write(result.stdout)
+        if result.stderr:
+            sys.stderr.write(result.stderr)
+        sys.exit(result.returncode)
 
     dispatch.__name__ = tool_name
     dispatch.__doc__ = f"Run `{pkg}` commands via the {tool_name} subcommand."
-    return dispatch
+    return app.command(
+        name=tool_name,
+        context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+    )(dispatch)
 
 
 for cmd_name in TOOLS:
-    app.command(name=cmd_name)(_make_dispatch(cmd_name))
+    _make_dispatch(cmd_name)
 
 
 def main():
