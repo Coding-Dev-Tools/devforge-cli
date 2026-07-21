@@ -153,9 +153,7 @@ def _make_dispatch(tool_name: str):
     """Create a typer command that dispatches to the underlying tool CLI."""
     pkg = TOOLS[tool_name]["package"]
 
-    def dispatch(
-        args: list[str] = typer.Argument(None, help="Arguments to pass to the tool."),  # noqa: B008
-    ):
+    def dispatch(ctx: typer.Context):
         info = TOOLS.get(tool_name)
         if not info:
             console.print(f"[red]Unknown tool: {tool_name}[/red]")
@@ -170,8 +168,12 @@ def _make_dispatch(tool_name: str):
             )
             raise typer.Exit(code=1)
 
+        # `ignore_unknown_options` + `allow_extra_args` let tool flags (e.g.
+        # `--config file.yaml`) reach the underlying CLI instead of being
+        # rejected by typer as "No such option".
+        forwarded = list(ctx.args)
         result = subprocess.run(
-            [sys.executable, "-m", module_name] + (args or []),
+            [sys.executable, "-m", module_name] + forwarded,
             capture_output=True,
             text=True,
         )
@@ -183,11 +185,14 @@ def _make_dispatch(tool_name: str):
 
     dispatch.__name__ = tool_name
     dispatch.__doc__ = f"Run `{pkg}` commands via the {tool_name} subcommand."
-    return dispatch
+    return app.command(
+        name=tool_name,
+        context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+    )(dispatch)
 
 
 for cmd_name in TOOLS:
-    app.command(name=cmd_name)(_make_dispatch(cmd_name))
+    _make_dispatch(cmd_name)
 
 
 def main():

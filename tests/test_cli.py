@@ -134,6 +134,27 @@ class TestDispatchCommands:
         cmd = mock_run.call_args[0][0]
         assert "api_contract_guardian" in cmd
 
+    @mock.patch("devforge.cli._is_tool_installed", return_value=True)
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_dispatch_forwards_tool_flags(self, mock_run, _mock_installed):
+        """Tool flags (e.g. `--config file.yaml`) must reach the underlying CLI.
+
+        Regression guard for the silent-failure trap where typer rejected any
+        argument beginning with `-` as 'No such option' before the tool ran.
+        With ignore_unknown_options/allow_extra_args, such flags are forwarded
+        via ctx.args.
+        """
+        mock_run.return_value = mock.MagicMock(returncode=0)
+        with mock.patch("devforge.cli.sys.exit"):
+            runner.invoke(app, ["guard", "--config", "x.yaml", "--verbose"])
+        mock_run.assert_called_once()
+        cmd = mock_run.call_args[0][0]
+        # Underlying module is launched...
+        assert "api_contract_guardian" in cmd
+        # ...and the tool flags are forwarded, not swallowed by typer.
+        assert "--config" in cmd
+        assert "x.yaml" in cmd
+        assert "--verbose" in cmd
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=False)
     def test_dispatch_install_hint_escapes_extra_brackets(self, _mock):
