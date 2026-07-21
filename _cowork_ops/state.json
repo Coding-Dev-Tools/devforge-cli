@@ -1,0 +1,14 @@
+{
+ "lock": {
+  "note": "devforge-cli"
+ },
+ "openFindings": [
+  {
+   "id": "rotation-stale-fresh-ring",
+   "ts": "2026-06-16T12:09:03.892192+00:00",
+   "severity": "medium",
+   "lane": "repo-improver",
+   "summary": "Manifest pointer followed directly after last verified blocked slot; write path hit false-positive stale lock channel. No repo mutators re-run this tick."
+  }
+ ]
+}

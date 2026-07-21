@@ -76,10 +76,8 @@ def list_tools(
             )
 
         console.print(table)
-        console.print(
-            "\n[dim]Install:[/dim] [green]pip install \"git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]\"[/green]"
-        )
-        console.print("[dim](devforge-tools is not on public PyPI — use the git+ form above.)[/dim]")
+        console.print("\n[dim]Install individually:[/dim] [green]pip install devforge-tools[guard][/green]")
+        console.print("[dim]Install all:[/dim] [green]pip install devforge-tools[all][/green]")
 
 
 @app.command()
@@ -98,9 +96,7 @@ def install(
         console.print(f"Available: {', '.join(TOOLS.keys())}, 'all'")
         raise typer.Exit(code=1)
 
-    # devforge-tools is NOT published on public PyPI — install from GitHub source.
-    repo_url = "https://github.com/Coding-Dev-Tools/devforge-cli.git"
-    pkg = f"git+{repo_url}[{extras}]"
+    pkg = f"devforge-tools[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
     try:
         result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
@@ -165,7 +161,7 @@ def _make_dispatch(tool_name: str):
         if not _is_tool_installed(module_name):
             console.print(
                 f"[red]Tool '{tool_name}' is not installed.[/red]\n"
-                f"Run: [green]pip install \"git+{info['url']}.git[{tool_name}]\"[/green]"
+                f"Run: [green]pip install devforge-tools\\[{tool_name}][/green]"
             )
             raise typer.Exit(code=1)
 
