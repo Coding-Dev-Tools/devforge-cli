@@ -122,7 +122,7 @@ class TestDispatchCommands:
         result = runner.invoke(app, ["guard"])
         assert result.exit_code == 1
         assert "not installed" in result.stdout
-        assert "pip install \"git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]\"" in result.stdout
+        assert 'pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]"' in result.stdout
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
     @mock.patch("devforge.cli.subprocess.run")
@@ -166,7 +166,7 @@ class TestDispatchCommands:
         """
         result = runner.invoke(app, ["guard"])
         assert result.exit_code == 1
-        assert "pip install \"git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]\"" in result.stdout
+        assert 'pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]"' in result.stdout
 
 
 class TestHelp:
