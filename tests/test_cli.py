@@ -58,7 +58,8 @@ class TestInstallCommand:
         call_args = mock_run.call_args[0][0]  # positional arg: the command list
         # Must contain the git+ URL with [all] extra, not a comma-joined list
         pkg_arg = next((a for a in call_args if "devforge-cli.git[" in a), None)
-        assert pkg_arg == "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]", f"Expected git+...devforge-cli.git[all], got {pkg_arg}"
+        expected = "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]"
+        assert pkg_arg == expected, f"Expected {expected}, got {pkg_arg}"
 
     def test_install_unknown_tool(self):
         """Error on unknown tool name."""
