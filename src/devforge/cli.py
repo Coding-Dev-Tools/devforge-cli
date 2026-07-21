@@ -77,7 +77,7 @@ def list_tools(
 
         console.print(table)
         console.print(
-            "\n[dim]Install:[/dim] [green]pip install \"git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]\"[/green]"
+            '\n[dim]Install:[/dim] [green]pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]"[/green]'
         )
         console.print("[dim](devforge-tools is not on public PyPI — use the git+ form above.)[/dim]")
 
@@ -163,7 +163,7 @@ def _make_dispatch(tool_name: str):
         if not _is_tool_installed(module_name):
             console.print(
                 f"[red]Tool '{tool_name}' is not installed.[/red]\n"
-                f"Run: [green]pip install \"git+https://github.com/Coding-Dev-Tools/devforge-cli.git\\[{tool_name}]\"[/green]",
+                f'Run: [green]pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git\\[{tool_name}]"[/green]',
                 soft_wrap=True,
             )
             raise typer.Exit(code=1)
