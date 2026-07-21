@@ -56,9 +56,9 @@ class TestInstallCommand:
         assert "Successfully" in result.stdout
         mock_run.assert_called_once()
         call_args = mock_run.call_args[0][0]  # positional arg: the command list
-        # Must contain "devforge-tools[all]", not "devforge-tools[guard,sql,...]"
-        pkg_arg = next((a for a in call_args if a.startswith("devforge-tools[")), None)
-        assert pkg_arg == "devforge-tools[all]", f"Expected devforge-tools[all], got {pkg_arg}"
+        # Must contain the git+ URL with [all] extra, not a comma-joined list
+        pkg_arg = next((a for a in call_args if "devforge-cli.git[" in a), None)
+        assert pkg_arg == "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]", f"Expected git+...devforge-cli.git[all], got {pkg_arg}"
 
     def test_install_unknown_tool(self):
         """Error on unknown tool name."""
@@ -121,7 +121,7 @@ class TestDispatchCommands:
         result = runner.invoke(app, ["guard"])
         assert result.exit_code == 1
         assert "not installed" in result.stdout
-        assert "pip install devforge-tools[guard]" in result.stdout
+        assert "pip install \"git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]\"" in result.stdout
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
     @mock.patch("devforge.cli.subprocess.run")
@@ -165,7 +165,7 @@ class TestDispatchCommands:
         """
         result = runner.invoke(app, ["guard"])
         assert result.exit_code == 1
-        assert "pip install devforge-tools[guard]" in result.stdout
+        assert "pip install \"git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]\"" in result.stdout
 
 
 class TestHelp:
