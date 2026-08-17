@@ -172,16 +172,13 @@ def _make_dispatch(tool_name: str):
         # `--config file.yaml`) reach the underlying CLI instead of being
         # rejected by typer as "No such option".
         forwarded = list(ctx.args)
-        result = subprocess.run(
+        # Stream output in real time via Popen with inherited file descriptors.
+        # The previous subprocess.run(capture_output=True) buffered all output
+        # in memory, causing UX lag and potential OOM on large tool output.
+        proc = subprocess.Popen(
             [sys.executable, "-m", module_name] + forwarded,
-            capture_output=True,
-            text=True,
         )
-        if result.stdout:
-            sys.stdout.write(result.stdout)
-        if result.stderr:
-            sys.stderr.write(result.stderr)
-        sys.exit(result.returncode)
+        sys.exit(proc.wait())
 
     dispatch.__name__ = tool_name
     dispatch.__doc__ = f"Run `{pkg}` commands via the {tool_name} subcommand."

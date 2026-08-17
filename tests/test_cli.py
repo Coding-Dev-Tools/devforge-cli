@@ -125,19 +125,21 @@ class TestDispatchCommands:
         assert 'pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]"' in result.stdout
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
-    @mock.patch("devforge.cli.subprocess.run")
-    def test_dispatch_installed_tool_runs(self, mock_run, _mock_installed):
+    @mock.patch("devforge.cli.subprocess.Popen")
+    def test_dispatch_installed_tool_runs(self, mock_popen, _mock_installed):
         """When a tool is installed, dispatch calls the subprocess."""
-        mock_run.return_value = mock.MagicMock(returncode=0)
+        mock_proc = mock.MagicMock()
+        mock_proc.wait.return_value = 0
+        mock_popen.return_value = mock_proc
         with mock.patch("devforge.cli.sys.exit"):
             runner.invoke(app, ["guard"])
-        mock_run.assert_called_once()
-        cmd = mock_run.call_args[0][0]
+        mock_popen.assert_called_once()
+        cmd = mock_popen.call_args[0][0]
         assert "api_contract_guardian" in cmd
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
-    @mock.patch("devforge.cli.subprocess.run")
-    def test_dispatch_forwards_tool_flags(self, mock_run, _mock_installed):
+    @mock.patch("devforge.cli.subprocess.Popen")
+    def test_dispatch_forwards_tool_flags(self, mock_popen, _mock_installed):
         """Tool flags (e.g. `--config file.yaml`) must reach the underlying CLI.
 
         Regression guard for the silent-failure trap where typer rejected any
@@ -145,11 +147,13 @@ class TestDispatchCommands:
         With ignore_unknown_options/allow_extra_args, such flags are forwarded
         via ctx.args.
         """
-        mock_run.return_value = mock.MagicMock(returncode=0)
+        mock_proc = mock.MagicMock()
+        mock_proc.wait.return_value = 0
+        mock_popen.return_value = mock_proc
         with mock.patch("devforge.cli.sys.exit"):
             runner.invoke(app, ["guard", "--config", "x.yaml", "--verbose"])
-        mock_run.assert_called_once()
-        cmd = mock_run.call_args[0][0]
+        mock_popen.assert_called_once()
+        cmd = mock_popen.call_args[0][0]
         # Underlying module is launched...
         assert "api_contract_guardian" in cmd
         # ...and the tool flags are forwarded, not swallowed by typer.
