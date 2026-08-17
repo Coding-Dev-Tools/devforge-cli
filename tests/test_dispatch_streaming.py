@@ -9,12 +9,9 @@ megabytes of output that should reach the user's terminal immediately.
 from __future__ import annotations
 
 import subprocess
-import sys
-from unittest import mock
-
-from typer.testing import CliRunner
-
 from devforge.cli import app
+from typer.testing import CliRunner
+from unittest import mock
 
 runner = CliRunner()
 
@@ -49,8 +46,7 @@ class TestDispatchStreaming:
                 "all output. Use subprocess.Popen or stdout=None to stream."
             )
             assert call_kwargs.get("stdout") is not subprocess.PIPE, (
-                "dispatch uses stdout=PIPE which buffers output. "
-                "Use stdout=None to inherit the parent's stdout."
+                "dispatch uses stdout=PIPE which buffers output. Use stdout=None to inherit the parent's stdout."
             )
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
@@ -58,9 +54,10 @@ class TestDispatchStreaming:
         """dispatch should use subprocess.Popen for real-time streaming,
         or subprocess.run without capture (stdout=None, stderr=None).
         """
-        with mock.patch("devforge.cli.subprocess.Popen") as mock_popen, \
-             mock.patch("devforge.cli.subprocess.run") as mock_run:
-
+        with (
+            mock.patch("devforge.cli.subprocess.Popen") as mock_popen,
+            mock.patch("devforge.cli.subprocess.run") as mock_run,
+        ):
             # Set up Popen mock to simulate a successful run
             mock_proc = mock.MagicMock()
             mock_proc.wait.return_value = 0
@@ -79,9 +76,7 @@ class TestDispatchStreaming:
                 assert kwargs.get("capture_output") is not True
                 assert kwargs.get("stdout") is not subprocess.PIPE
             else:
-                raise AssertionError(
-                    "Neither subprocess.Popen nor subprocess.run was called"
-                )
+                raise AssertionError("Neither subprocess.Popen nor subprocess.run was called")
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
     def test_dispatch_exit_code_propagates(self, _mock_installed):
