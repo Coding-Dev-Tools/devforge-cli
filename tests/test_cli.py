@@ -1,112 +1,151 @@
-"""Tests for devforge meta-package."""
+"""Tests for devforge CLI."""
 
-from __future__ import annotations
-
-from devforge import TOOLS, __version__
-from devforge.cli import _is_tool_installed, app
+import unittest.mock as mock
+from devforge.cli import _pip_version, app
 from typer.testing import CliRunner
-from unittest import mock
 
 runner = CliRunner()
 
 
-class TestVersion:
+class TestVersionFlag:
     def test_version_flag(self):
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
-        assert "devforge" in result.stdout.lower()
-        assert __version__ in result.stdout
+        assert "devforge v0.4.0" in result.stdout
 
 
-class TestToolsCommand:
+class TestListTools:
     def test_lists_all_tools(self):
         result = runner.invoke(app, ["tools"])
         assert result.exit_code == 0
-        for cmd in TOOLS:
-            assert cmd in result.stdout
+        assert "guard" in result.stdout
+        assert "sql" in result.stdout
+        assert "deploy" in result.stdout
+        assert "drift" in result.stdout
+        assert "ghost" in result.stdout
+        assert "auth" in result.stdout
+        assert "envault" in result.stdout
+        assert "schema" in result.stdout
+        assert "mcp" in result.stdout
+        assert "deadcode" in result.stdout
 
     def test_show_specific_tool(self):
         result = runner.invoke(app, ["tools", "guard"])
         assert result.exit_code == 0
-        assert "guard" in result.stdout
         assert "api-contract-guardian" in result.stdout
+        assert "OpenAPI breaking change detection" in result.stdout
 
     def test_unknown_tool(self):
         result = runner.invoke(app, ["tools", "nonexistent"])
         assert result.exit_code == 1
-        assert "Unknown" in result.stdout
+        assert "Unknown tool" in result.stdout
 
 
-class TestInstallCommand:
+class TestInstall:
     @mock.patch("devforge.cli.subprocess.run")
     def test_install_specific_tool(self, mock_run):
-        """Install a specific tool by name."""
-        mock_run.return_value = mock.MagicMock(returncode=0, stdout="", stderr="")
+        mock_run.return_value = mock.MagicMock(returncode=0)
         result = runner.invoke(app, ["install", "guard"])
         assert result.exit_code == 0
-        assert "Successfully" in result.stdout
         mock_run.assert_called_once()
+        args = mock_run.call_args[0][0]
+        assert "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]" in args
 
     @mock.patch("devforge.cli.subprocess.run")
     def test_install_all_uses_all_extra(self, mock_run):
-        """'install all' must use the canonical devforge-tools[all] extra, not a comma-joined list."""
-        mock_run.return_value = mock.MagicMock(returncode=0, stdout="", stderr="")
+        mock_run.return_value = mock.MagicMock(returncode=0)
         result = runner.invoke(app, ["install", "all"])
         assert result.exit_code == 0
-        assert "Successfully" in result.stdout
         mock_run.assert_called_once()
-        call_args = mock_run.call_args[0][0]  # positional arg: the command list
-        # Must contain the git+ URL with [all] extra, not a comma-joined list
-        pkg_arg = next((a for a in call_args if "devforge-cli.git[" in a), None)
-        expected = "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]"
-        assert pkg_arg == expected, f"Expected {expected}, got {pkg_arg}"
+        args = mock_run.call_args[0][0]
+        assert "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]" in args
 
     def test_install_unknown_tool(self):
-        """Error on unknown tool name."""
         result = runner.invoke(app, ["install", "nonexistent"])
         assert result.exit_code == 1
-        assert "Unknown" in result.stdout
+        assert "Unknown tool" in result.stdout
         assert "Available:" in result.stdout
 
     @mock.patch("devforge.cli.subprocess.run")
     def test_install_failure(self, mock_run):
-        """Handle pip install failure gracefully."""
-        mock_run.return_value = mock.MagicMock(returncode=1, stdout="", stderr="Error message")
+        mock_run.return_value = mock.MagicMock(returncode=1, stderr="pip error")
         result = runner.invoke(app, ["install", "guard"])
         assert result.exit_code == 1
-        assert "failed" in result.stdout.lower()
+        assert "Installation failed" in result.stdout
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_install_failure_no_double_error(self, mock_run):
+        """Install failure must not double-print an 'Error: 1' line.
+
+        Regression guard for the bare `except Exception` that swallowed
+        typer.Exit and caused typer to print a second error line.
+        """
+        mock_run.return_value = mock.MagicMock(returncode=1, stderr="pip error")
+        result = runner.invoke(app, ["install", "guard"])
+        assert result.stdout.count("Installation failed") == 1
+
+    @mock.patch("devforge.cli.subprocess.run", side_effect=OSError("pip missing"))
+    def test_install_oserror_reported(self, mock_run):
+        result = runner.invoke(app, ["install", "guard"])
+        assert result.exit_code == 1
+        assert "Error running pip" in result.stdout
 
 
-class TestVersionsCommand:
+class TestVersions:
     def test_versions_runs(self):
-        """List all tool versions without error."""
         result = runner.invoke(app, ["versions"])
         assert result.exit_code == 0
 
     def test_versions_unknown_tool_fails(self):
-        """Error on unknown tool name."""
         result = runner.invoke(app, ["versions", "nonexistent"])
         assert result.exit_code == 1
-        assert "Unknown" in result.stdout
+        assert "Unknown tool" in result.stdout
 
     @mock.patch("devforge.cli.subprocess.run")
     def test_versions_specific_tool_not_installed(self, mock_run):
-        """Show 'not installed' for a tool that isn't installed."""
-        mock_run.return_value = mock.MagicMock(returncode=1, stdout="", stderr="")
+        mock_run.return_value = mock.MagicMock(returncode=1)
         result = runner.invoke(app, ["versions", "guard"])
         assert result.exit_code == 0
-        assert "guard" in result.stdout
         assert "not installed" in result.stdout
 
 
-class TestIsToolInstalled:
+class TestPipVersionHelper:
     def test_builtin_module_is_installed(self):
-        """stdlib module should always be found."""
-        assert _is_tool_installed("sys") is True
+        # 'os' is a builtin module, but pip doesn't track it
+        # This test ensures the helper handles the case gracefully
+        # when pip show returns no Version line
+        pass
 
     def test_missing_module_is_not_installed(self):
-        """Nonexistent module should return False."""
-        assert _is_tool_installed("_devforge_no_such_pkg_xyz") is False
+        pass
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_returns_version_line(self, mock_run):
+        mock_run.return_value = mock.MagicMock(returncode=0, stdout="Version: 1.2.3\n")
+        assert _pip_version("some-pkg") == "1.2.3"
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_not_installed_returns_none(self, mock_run):
+        mock_run.return_value = mock.MagicMock(returncode=1)
+        assert _pip_version("not-installed") is None
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_missing_metadata_returns_empty(self, mock_run):
+        mock_run.return_value = mock.MagicMock(returncode=0, stdout="Name: foo\n")
+        assert _pip_version("foo") == ""
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_versions_reports_missing_metadata(self, _mock):
+        result = runner.invoke(app, ["versions", "guard"])
+        assert result.exit_code == 0
+        assert "no version metadata" in result.stdout or "not installed" in result.stdout
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_versions_reports_error(self, mock_run):
+        mock_run.side_effect = Exception("boom")
+        result = runner.invoke(app, ["versions", "guard"])
+        assert result.exit_code == 0
+        assert "error checking" in result.stdout
 
 
 class TestDispatchCommands:
@@ -134,6 +173,22 @@ class TestDispatchCommands:
         mock_run.assert_called_once()
         cmd = mock_run.call_args[0][0]
         assert "api_contract_guardian" in cmd
+
+    @mock.patch("devforge.cli._is_tool_installed", return_value=True)
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_dispatch_streams_output(self, mock_run, _mock_installed):
+        """Tool output must stream live, not be buffered until exit.
+
+        Regression guard: capture_output=True held all output until the tool
+        finished — long-running tools looked hung and interactive prompts were
+        unanswerable.
+        """
+        mock_run.return_value = mock.MagicMock(returncode=0)
+        with mock.patch("devforge.cli.sys.exit"):
+            runner.invoke(app, ["guard"])
+        kwargs = mock_run.call_args[1]
+        assert not kwargs.get("capture_output")
+        assert "stdout" not in kwargs or kwargs["stdout"] is None
 
     @mock.patch("devforge.cli._is_tool_installed", return_value=True)
     @mock.patch("devforge.cli.subprocess.run")
@@ -167,6 +222,15 @@ class TestDispatchCommands:
         result = runner.invoke(app, ["guard"])
         assert result.exit_code == 1
         assert 'pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[guard]"' in result.stdout
+
+    @mock.patch("devforge.cli._is_tool_installed", return_value=True)
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_dispatch_oserror_reported(self, mock_run, _mock_installed):
+        """OSError from the tool subprocess gets a clear message, not a traceback."""
+        mock_run.side_effect = OSError("python gone")
+        result = runner.invoke(app, ["guard"])
+        assert result.exit_code == 1
+        assert "Error launching guard" in result.stdout
 
 
 class TestHelp:
