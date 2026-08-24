@@ -102,16 +102,21 @@ def install(
     repo_url = "https://github.com/Coding-Dev-Tools/devforge-cli.git"
     pkg = f"git+{repo_url}[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
+    # Only catch OS-level failures here. A bare `except Exception` would also
+    # swallow the typer.Exit raised below (typer.Exit subclasses Exception),
+    # double-printing an error line ("Error: 1") after the failure message.
     try:
-        result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
-        if result.returncode == 0:
-            console.print(f"[green]Successfully installed:[/green] {', '.join(targets)}")
-        else:
-            console.print(f"[red]Installation failed:[/red] {result.stderr[:500]}")
-            raise typer.Exit(code=1)
-    except Exception as e:
-        console.print(f"[red]Error: {e}[/red]")
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True
+        )
+    except OSError as e:
+        console.print(f"[red]Error running pip:[/red] {e}")
         raise typer.Exit(code=1) from e
+    if result.returncode == 0:
+        console.print(f"[green]Successfully installed:[/green] {', '.join(targets)}")
+    else:
+        console.print(f"[red]Installation failed:[/red] {result.stderr[:500]}")
+        raise typer.Exit(code=1)
 
 
 @app.command(name="versions")
@@ -128,19 +133,35 @@ def show_versions(
     for t in targets:
         info = TOOLS[t]
         try:
-            result = subprocess.run(
-                [sys.executable, "-m", "pip", "show", info["package"]], capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                for line in result.stdout.splitlines():
-                    if line.startswith("Version:"):
-                        ver = line.split(":", 1)[1].strip()
-                        console.print(f"[cyan]{t:8}[/cyan] v{ver}")
-                        break
-            else:
-                console.print(f"[dim]{t:8}[/dim] [red]not installed[/red]")
-        except Exception:
-            console.print(f"[dim]{t:8}[/dim] [red]error checking[/red]")
+            ver = _pip_version(info["package"])
+        except Exception as e:
+            console.print(f"[dim]{t:8}[/dim] [red]error checking ({e})[/red]")
+            continue
+        if ver is None:
+            console.print(f"[dim]{t:8}[/dim] [red]not installed[/red]")
+        elif ver == "":
+            # pip show succeeded but returned no Version metadata — never stay silent.
+            console.print(f"[dim]{t:8}[/dim] [yellow]installed, no version metadata[/yellow]")
+        else:
+            console.print(f"[cyan]{t:8}[/cyan] v{ver}")
+
+
+def _pip_version(package: str) -> str | None:
+    """Return the installed version of *package*, or None if not installed.
+
+    Returns "" when ``pip show`` succeeds but the output carries no
+    ``Version:`` line (broken metadata) so callers can distinguish it from a
+    clean not-installed result instead of silently printing nothing.
+    """
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "show", package], capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        return None
+    for line in result.stdout.splitlines():
+        if line.startswith("Version:"):
+            return line.split(":", 1)[1].strip()
+    return ""
 
 
 def _is_tool_installed(module_name: str) -> bool:
@@ -172,15 +193,21 @@ def _make_dispatch(tool_name: str):
         # `--config file.yaml`) reach the underlying CLI instead of being
         # rejected by typer as "No such option".
         forwarded = list(ctx.args)
-        result = subprocess.run(
-            [sys.executable, "-m", module_name] + forwarded,
-            capture_output=True,
-            text=True,
-        )
-        if result.stdout:
-            sys.stdout.write(result.stdout)
-        if result.stderr:
-            sys.stderr.write(result.stderr)
+        # Stream the tool's output directly to our stdout/stderr instead of
+        # capturing it. capture_output=True buffered everything until the tool
+        # exited — long-running invocations looked hung (silent-green trap),
+        # and interactive prompts from the tool could never be answered.
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", module_name] + forwarded,
+            )
+        except OSError as e:
+            console.print(f"[red]Error launching {tool_name}:[/red] {e}")
+            raise typer.Exit(code=1) from e
+        except KeyboardInterrupt:
+            # Forward Ctrl-C as a conventional 130 exit, not a raw traceback.
+            console.print("[yellow]Interrupted.[/yellow]")
+            sys.exit(130)
         sys.exit(result.returncode)
 
     dispatch.__name__ = tool_name
