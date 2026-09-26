@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from devforge import TOOLS, __version__
-from devforge.cli import _is_tool_installed, app
+from devforge.cli import _is_tool_installed, _pip_version, app
 from typer.testing import CliRunner
 from unittest import mock
 
@@ -75,6 +75,22 @@ class TestInstallCommand:
         result = runner.invoke(app, ["install", "guard"])
         assert result.exit_code == 1
         assert "failed" in result.stdout.lower()
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_install_failure_with_bracketed_stderr_exits_cleanly(self, mock_run):
+        """pip stderr with brackets must not raise MarkupError or lose the exit code.
+
+        Regression guard: an unescaped ``[/red]`` in pip's stderr raised inside
+        ``console.print`` and the except handler raised again, so the user saw a
+        traceback instead of a clean failure.
+        """
+        mock_run.return_value = mock.MagicMock(
+            returncode=1, stdout="", stderr="ERROR: [WinError 2] no such file [/red]"
+        )
+        result = runner.invoke(app, ["install", "guard"])
+        assert result.exit_code == 1
+        assert "failed" in result.stdout.lower()
+        assert "MarkupError" not in result.stdout
 
 
 class TestVersionsCommand:
@@ -176,3 +192,55 @@ class TestHelp:
         assert "tools" in result.stdout
         assert "versions" in result.stdout
         assert "guard" in result.stdout
+
+
+class TestPipVersionHelper:
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_returns_version_line(self, mock_run):
+        """Parse Version: out of successful pip show output."""
+        mock_run.return_value = mock.MagicMock(returncode=0, stdout="Name: x\nVersion: 1.2.3\n")
+        assert _pip_version("x") == "1.2.3"
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_not_installed_returns_none(self, mock_run):
+        mock_run.return_value = mock.MagicMock(returncode=1, stdout="", stderr="not found")
+        assert _pip_version("x") is None
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_missing_metadata_returns_empty(self, mock_run):
+        """pip show success without a Version line must NOT look like not installed."""
+        mock_run.return_value = mock.MagicMock(returncode=0, stdout="Name: x\n")
+        assert _pip_version("x") == ""
+
+    @mock.patch("devforge.cli._pip_version", return_value="")
+    def test_versions_reports_missing_metadata(self, _mock):
+        """Silent-green regression guard: broken metadata gets an explicit line."""
+        result = runner.invoke(app, ["versions", "guard"])
+        assert result.exit_code == 0
+        assert "no version metadata" in result.stdout
+
+    @mock.patch("devforge.cli._pip_version", side_effect=OSError("boom"))
+    def test_versions_reports_error(self, _mock):
+        result = runner.invoke(app, ["versions", "guard"])
+        assert result.exit_code == 0
+        assert "error checking" in result.stdout
+
+    @mock.patch("devforge.cli._pip_version", side_effect=OSError("bad [/red] tag [WinError 2]"))
+    def test_versions_error_text_cannot_break_rich_markup(self, _mock):
+        """Exception text must be escaped, not parsed as rich markup.
+
+        Without escaping, a message containing ``[/red]`` raises MarkupError and
+        aborts the whole listing with no output at all.
+        """
+        result = runner.invoke(app, ["versions", "guard"])
+        assert result.exit_code == 0
+        assert "error checking" in result.stdout
+        assert "boom" in result.stdout or "[/red]" in result.stdout
+        assert "MarkupError" not in result.stdout
+
+    @mock.patch("devforge.cli.subprocess.run")
+    def test_decodes_non_ascii_metadata(self, mock_run):
+        """Non-ASCII metadata must not raise while decoding pip output."""
+        mock_run.return_value = mock.MagicMock(returncode=0, stdout="Name: x\nAuthor: Ünïcodé ✓\nVersion: 2.0.1\n")
+        assert _pip_version("x") == "2.0.1"
+        assert mock_run.call_args.kwargs.get("errors") == "replace"

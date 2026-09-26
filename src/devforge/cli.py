@@ -6,6 +6,7 @@ import sys
 import typer
 from devforge import TOOLS, __version__
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 
@@ -103,14 +104,26 @@ def install(
     pkg = f"git+{repo_url}[{extras}]"
     console.print(f"[yellow]Installing {pkg}...[/yellow]")
     try:
-        result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", pkg],
+            capture_output=True,
+            text=True,
+            errors="replace",
+        )
         if result.returncode == 0:
             console.print(f"[green]Successfully installed:[/green] {', '.join(targets)}")
         else:
-            console.print(f"[red]Installation failed:[/red] {result.stderr[:500]}")
+            # pip error text routinely contains brackets such as ``[WinError 2]``;
+            # escape it so a failed install still exits cleanly with its message.
+            console.print(
+                f"[red]Installation failed:[/red] {escape(result.stderr[:500])}",
+                soft_wrap=True,
+            )
             raise typer.Exit(code=1)
+    except typer.Exit:
+        raise
     except Exception as e:
-        console.print(f"[red]Error: {e}[/red]")
+        console.print(f"[red]Error: {escape(str(e))}[/red]", soft_wrap=True)
         raise typer.Exit(code=1) from e
 
 
@@ -128,19 +141,42 @@ def show_versions(
     for t in targets:
         info = TOOLS[t]
         try:
-            result = subprocess.run(
-                [sys.executable, "-m", "pip", "show", info["package"]], capture_output=True, text=True
-            )
-            if result.returncode == 0:
-                for line in result.stdout.splitlines():
-                    if line.startswith("Version:"):
-                        ver = line.split(":", 1)[1].strip()
-                        console.print(f"[cyan]{t:8}[/cyan] v{ver}")
-                        break
-            else:
-                console.print(f"[dim]{t:8}[/dim] [red]not installed[/red]")
-        except Exception:
-            console.print(f"[dim]{t:8}[/dim] [red]error checking[/red]")
+            ver = _pip_version(info["package"])
+        except Exception as e:
+            # Exception text can contain rich markup such as ``[/red]`` or ``[WinError 2]``;
+            # escape it so an unrelated tool failure can never abort the whole listing.
+            console.print(f"[dim]{t:8}[/dim] [red]error checking ({escape(str(e))})[/red]")
+            continue
+        if ver is None:
+            console.print(f"[dim]{t:8}[/dim] [red]not installed[/red]")
+        elif ver == "":
+            # pip show succeeded but returned no Version metadata — never stay silent.
+            console.print(f"[dim]{t:8}[/dim] [yellow]installed, no version metadata[/yellow]")
+        else:
+            console.print(f"[cyan]{t:8}[/cyan] v{ver}")
+
+
+def _pip_version(package: str) -> str | None:
+    """Return the installed version of *package*, or None if not installed.
+
+    Returns "" when ``pip show`` succeeds but the output carries no
+    ``Version:`` line (broken metadata) so callers can distinguish it from a
+    clean not-installed result instead of silently printing nothing.
+    """
+    # ``errors="replace"`` keeps non-ASCII metadata from raising inside the decode
+    # step and hiding an otherwise readable version.
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "show", package],
+        capture_output=True,
+        text=True,
+        errors="replace",
+    )
+    if result.returncode != 0:
+        return None
+    for line in result.stdout.splitlines():
+        if line.startswith("Version:"):
+            return line.split(":", 1)[1].strip()
+    return ""
 
 
 def _is_tool_installed(module_name: str) -> bool:
