@@ -106,9 +106,7 @@ def install(
     # swallow the typer.Exit raised below (typer.Exit subclasses Exception),
     # double-printing an error line ("Error: 1") after the failure message.
     try:
-        result = subprocess.run(
-            [sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True
-        )
+        result = subprocess.run([sys.executable, "-m", "pip", "install", pkg], capture_output=True, text=True)
     except OSError as e:
         console.print(f"[red]Error running pip:[/red] {e}")
         raise typer.Exit(code=1) from e
@@ -153,9 +151,7 @@ def _pip_version(package: str) -> str | None:
     ``Version:`` line (broken metadata) so callers can distinguish it from a
     clean not-installed result instead of silently printing nothing.
     """
-    result = subprocess.run(
-        [sys.executable, "-m", "pip", "show", package], capture_output=True, text=True
-    )
+    result = subprocess.run([sys.executable, "-m", "pip", "show", package], capture_output=True, text=True)
     if result.returncode != 0:
         return None
     for line in result.stdout.splitlines():
