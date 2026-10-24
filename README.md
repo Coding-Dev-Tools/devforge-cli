@@ -28,7 +28,7 @@ Instead of installing ten separate tools and learning ten different CLIs, the `d
 
 ```bash
 # Install everything (recommended)
-pip install "git+https://github.com/Coding-Dev-Tools/devforge-cli.git[all]"
+pip install "devforge-tools[all] @ git+https://github.com/Coding-Dev-Tools/devforge-cli.git"
 
 # Or clone and install locally
 git clone https://github.com/Coding-Dev-Tools/devforge-cli.git
